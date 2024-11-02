@@ -1,8 +1,17 @@
 {
+  "name": "@inbestigator/dext",
+  "version": "0.1.0",
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
     "@std/fmt": "jsr:@std/fmt@^1.0.3",
     "discord.js": "npm:discord.js@^14.16.3"
+  },
+  "publish": {
+    "include": [
+      "lib",
+      "README.md",
+      "deno.json"
+    ]
   },
   "exports": "./lib/exports.ts"
 }

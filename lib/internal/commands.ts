@@ -1,13 +1,13 @@
-import {
-  type Client,
-  type CommandInteraction,
-  type InteractionReplyOptions,
+import type {
+  Client,
+  CommandInteraction,
+  InteractionReplyOptions,
 } from "discord.js";
 import type { Command, DextConfig } from "./types.ts";
 import { join } from "node:path";
 import { underline } from "@std/fmt/colors";
 import loader from "./loader.ts";
-import { CommandData } from "../exports.ts";
+import type { CommandData } from "../exports.ts";
 
 interface InteractionMock extends CommandInteraction {
   // deno-lint-ignore no-explicit-any
