@@ -174,7 +174,7 @@ export default async function setupCommands(
               command,
               interaction,
               client,
-              config.cacheExpiry
+              config.cacheExpiry ?? 24 * 60 * 60 * 1000
             );
           } else {
             await command?.default(interaction, client);

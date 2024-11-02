@@ -5,13 +5,34 @@ import type {
   CommandInteraction,
 } from "discord.js";
 
+/**
+ * The configuration for the bot.
+ */
 export interface DextConfig {
+  /**
+   * Discord client options.
+   */
   client: ClientOptions;
+
+  /**
+   * The user id of the bot.
+   */
   clientId: string;
+
+  /**
+   * The secret for the bot.
+   */
   clientSecret?: string;
-  cacheExpiry: number;
+
+  /**
+   * How long to cache static commands before revalidating.
+   */
+  cacheExpiry?: number;
 }
 
+/**
+ * A command.
+ */
 export interface Command {
   /**
    * Name of command, internal
