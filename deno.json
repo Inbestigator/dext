@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/fmt": "jsr:@std/fmt@^1.0.3",
+    "discord.js": "npm:discord.js@^14.16.3"
+  },
+  "exports": "./lib/exports.ts"
+}
