@@ -30,9 +30,6 @@ export interface DextConfig {
   cacheExpiry?: number;
 }
 
-/**
- * A command.
- */
 export interface Command {
   /**
    * Name of command, internal
