@@ -34,6 +34,10 @@ try {
   console.error("Error while initializing client: ", e);
 }
 
+client.once("ready", () => {
+  loader(`Logged in as ${client.user?.displayName}`).resolve();
+});
+
 setupCommands(client, config);
 
 async function fetchConfig(): Promise<DextConfig | null> {

@@ -54,5 +54,15 @@ export interface Command {
    */
   default: (interaction: CommandInteraction, client: Client) => unknown;
 
+  /**
+   * If the command is pregenerated
+   */
   pregenerated?: boolean;
+
+  /**
+   * How long to cache this static command before revalidating.
+   *
+   * **Overrides `cacheExpiry` config**
+   */
+  revalidate?: number;
 }

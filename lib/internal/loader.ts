@@ -4,7 +4,7 @@ export default function loader(text: string) {
   const animationInterval = setInterval(async () => {
     const dot = dots[dotsIndex % dots.length];
     await Deno.stdout.write(
-      new TextEncoder().encode(`\r   ${text}  \x1b[36m${dot}\x1b[0m`)
+      new TextEncoder().encode(`\r   ${text}  \x1b[36m${dot}\x1b[0m`),
     );
     dotsIndex++;
   }, 300);
@@ -14,13 +14,13 @@ export default function loader(text: string) {
     resolve: async () => {
       clearInterval(animationInterval);
       await Deno.stdout.write(
-        new TextEncoder().encode(`\r \x1b[32m✓\x1b[0m ${text}     \n`)
+        new TextEncoder().encode(`\r \x1b[32m✓\x1b[0m ${text}     \n`),
       );
     },
     error: async () => {
       clearInterval(animationInterval);
       await Deno.stdout.write(
-        new TextEncoder().encode(`\r \x1b[31m✕\x1b[0m ${text}     \n`)
+        new TextEncoder().encode(`\r \x1b[31m✕\x1b[0m ${text}     \n`),
       );
     },
   };

@@ -1,5 +1,14 @@
 import type { CommandInteraction } from "discord.js";
+import { CommandData } from "../../../lib/exports.ts";
+
+export const config: CommandData = {
+  description: "Returns a greeting",
+  options: [],
+};
 
 export default function dynamicCmd(interaction: CommandInteraction) {
-  interaction.reply("Hey there, " + interaction.user.displayName + "!");
+  interaction.reply({
+    content: `Hey there, ${interaction.user.displayName}!`,
+    ephemeral: true,
+  });
 }

@@ -7,13 +7,15 @@ import type { Command, DextConfig } from "./types.ts";
 import { join } from "node:path";
 import { underline } from "@std/fmt/colors";
 import loader from "./loader.ts";
+import { CommandData } from "../exports.ts";
 
 interface InteractionMock extends CommandInteraction {
+  // deno-lint-ignore no-explicit-any
   reply: (options: InteractionReplyOptions & { fetchReply: true }) => any;
   response: InteractionReplyOptions | null;
 }
 
-function createInteractionMock(): InteractionMock {
+function createInteractionMock(command: Command): InteractionMock {
   let response: InteractionReplyOptions | null = null;
 
   const handler = {
@@ -26,7 +28,15 @@ function createInteractionMock(): InteractionMock {
         case "showModal":
           return target.showModal;
         default:
-          throw new Error();
+          if (command.pregenerated !== true) {
+            throw new Error();
+          } else {
+            console.warn(
+              " \x1b[33m!\x1b[0m",
+              `Explicitly static command "${command.name}" tries to access dynamic property "${prop}"`
+            );
+            return false;
+          }
       }
     },
   };
@@ -53,24 +63,33 @@ async function validateAndCache(
       new TextDecoder().decode(Deno.readFileSync(cacheFilePath))
     );
 
-    if (Date.now() - stamp < expiry) {
+    if (Date.now() - stamp < (command.revalidate ?? expiry)) {
       interaction.reply(response);
       return;
     }
-  } catch {}
+  } catch {
+    // pass
+  }
 
-  const interactionMock = createInteractionMock();
-  await command.default(interactionMock, client);
+  const originalReply = interaction.reply;
+  let response: string = "";
 
-  if (interactionMock.response) {
+  // @ts-expect-error Weird error
+  interaction.reply = (options: InteractionReplyOptions) => {
+    response = JSON.stringify(options);
+    return originalReply.apply(interaction, [options]);
+  };
+
+  await command.default(interaction, client);
+
+  if (response) {
     Deno.writeTextFileSync(
       cacheFilePath,
       JSON.stringify({
-        response: interactionMock.response,
+        response,
         stamp: Date.now(),
       })
     );
-    interaction.reply(interactionMock.response);
   }
 }
 
@@ -79,13 +98,9 @@ export default async function setupCommands(
   config: DextConfig
 ) {
   const commands = await fetchCommands();
-  client.once(
-    "ready",
-    () =>
-      void (async () => {
-        await client.application?.commands.set(commands);
-      })()
-  );
+
+  await client.application?.commands.set(commands);
+
   const generatingLoader = loader("Generating commands");
 
   try {
@@ -110,7 +125,7 @@ export default async function setupCommands(
   }
   const generatedResults = await Promise.all(
     commands.map(async (command, i) => {
-      const interactionMock = createInteractionMock();
+      const interactionMock = createInteractionMock(command);
 
       try {
         const result = await Promise.resolve(
@@ -119,11 +134,16 @@ export default async function setupCommands(
         if (result instanceof Promise) {
           throw new Error();
         }
-      } catch {}
+      } catch {
+        // pass
+      }
 
       const response = interactionMock.response;
 
-      if (!response) {
+      if (
+        (!response && command.pregenerated !== true) ||
+        command.pregenerated === false
+      ) {
         sendType(command.name, false);
         commands[i].pregenerated = false;
         return false;
@@ -168,8 +188,12 @@ export default async function setupCommands(
           (c) => c.name === interaction.commandName
         );
 
+        if (!command) {
+          return;
+        }
+
         try {
-          if (command?.pregenerated === true) {
+          if (command.pregenerated === true) {
             await validateAndCache(
               command,
               interaction,
@@ -177,10 +201,10 @@ export default async function setupCommands(
               config.cacheExpiry ?? 24 * 60 * 60 * 1000
             );
           } else {
-            await command?.default(interaction, client);
+            await command.default(interaction, client);
           }
         } catch (error) {
-          console.error(`Failed to run command "${command?.name}":`, error);
+          console.error(`Failed to run command "${command.name}":`, error);
         }
       })()
   );
@@ -191,14 +215,20 @@ async function fetchCommands() {
   const commandData: Command[] = [];
 
   for (const commandName of commandNames) {
-    const commandModule = (await import(commandName)) as Command;
+    const commandModule = (await import(commandName)) as {
+      config?: CommandData;
+      default: (interaction: CommandInteraction, client: Client) => unknown;
+    };
     const command: Command = {
       name: commandName
         .split(/[\\\/]/)
         .pop()!
         .split(".")[0],
-      description: commandModule.description ?? "No description provided",
-      options: commandModule.options ?? [],
+      description:
+        commandModule.config?.description ?? "No description provided",
+      options: commandModule.config?.options ?? [],
+      pregenerated: commandModule.config?.pregenerated,
+      revalidate: commandModule.config?.revalidate,
       default: commandModule.default,
     };
 
