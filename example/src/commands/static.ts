@@ -1,5 +1,5 @@
 import type { CommandInteraction } from "discord.js";
-import { CommandData } from "../../../lib/exports.ts";
+import type { CommandData } from "../../../lib/exports.ts";
 
 export const config: CommandData = {
   description: "Shows how a pregenerated command doesn't run every time",

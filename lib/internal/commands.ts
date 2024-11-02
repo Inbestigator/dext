@@ -33,7 +33,7 @@ function createInteractionMock(command: Command): InteractionMock {
           } else {
             console.warn(
               " \x1b[33m!\x1b[0m",
-              `Explicitly static command "${command.name}" tries to access dynamic property "${prop}"`
+              `Explicitly static command "${command.name}" tries to access dynamic property "${prop}"`,
             );
             return false;
           }
@@ -54,13 +54,13 @@ async function validateAndCache(
   command: Command,
   interaction: CommandInteraction,
   client: Client,
-  expiry: number
+  expiry: number,
 ) {
   const cacheFilePath = `./.dext/commands/${command.name}.json`;
 
   try {
     const { response, stamp } = JSON.parse(
-      new TextDecoder().decode(Deno.readFileSync(cacheFilePath))
+      new TextDecoder().decode(Deno.readFileSync(cacheFilePath)),
     );
 
     if (Date.now() - stamp < (command.revalidate ?? expiry)) {
@@ -88,14 +88,14 @@ async function validateAndCache(
       JSON.stringify({
         response,
         stamp: Date.now(),
-      })
+      }),
     );
   }
 }
 
 export default async function setupCommands(
   client: Client,
-  config: DextConfig
+  config: DextConfig,
 ) {
   const commands = await fetchCommands();
 
@@ -129,7 +129,7 @@ export default async function setupCommands(
 
       try {
         const result = await Promise.resolve(
-          command.default(interactionMock, client)
+          command.default(interactionMock, client),
         );
         if (result instanceof Promise) {
           throw new Error();
@@ -155,12 +155,12 @@ export default async function setupCommands(
         JSON.stringify({
           response,
           stamp: Date.now(),
-        })
+        }),
       );
       commands[i].pregenerated = true;
 
       return true;
-    })
+    }),
   );
 
   generatingLoader.resolve();
@@ -175,7 +175,7 @@ export default async function setupCommands(
       generatedResults.includes(false)
         ? "\nƒ  (Dynamic)  re-evaluated every interaction"
         : ""
-    }`
+    }`,
   );
 
   client.on(
@@ -185,7 +185,7 @@ export default async function setupCommands(
         if (!interaction.isCommand()) return;
 
         const command = commands.find(
-          (c) => c.name === interaction.commandName
+          (c) => c.name === interaction.commandName,
         );
 
         if (!command) {
@@ -198,7 +198,7 @@ export default async function setupCommands(
               command,
               interaction,
               client,
-              config.cacheExpiry ?? 24 * 60 * 60 * 1000
+              config.cacheExpiry ?? 24 * 60 * 60 * 1000,
             );
           } else {
             await command.default(interaction, client);
@@ -206,7 +206,7 @@ export default async function setupCommands(
         } catch (error) {
           console.error(`Failed to run command "${command.name}":`, error);
         }
-      })()
+      })(),
   );
 }
 
@@ -224,8 +224,8 @@ async function fetchCommands() {
         .split(/[\\\/]/)
         .pop()!
         .split(".")[0],
-      description:
-        commandModule.config?.description ?? "No description provided",
+      description: commandModule.config?.description ??
+        "No description provided",
       options: commandModule.config?.options ?? [],
       pregenerated: commandModule.config?.pregenerated,
       revalidate: commandModule.config?.revalidate,
