@@ -6,10 +6,9 @@ import { join } from "node:path";
 import authorize from "./core/authorize.ts";
 import { Command } from "commander";
 
-const program = new Command({
-  app_name: "dext",
-  app_description: "Compile Discord.js commands at build time.",
-});
+const program = new Command();
+
+program.name("dext").description("Compile Discord.js commands at build time.");
 
 program
   .command("dev1")
