@@ -91,7 +91,7 @@ function createInteractionMock(
             " \x1b[33m!\x1b[0m",
             `Explicitly static command "${command.name}" tries to access dynamic property "${prop}"`,
           );
-          return interaction![prop];
+          return target[prop] ?? false;
         }
       }
     },
