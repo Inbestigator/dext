@@ -74,8 +74,13 @@ program
     try {
       const example = simple ? "../examples/simple" : "../examples/base";
 
-      const scriptDir = dirname(fileURLToPath(import.meta.url));
-      const basePath = join(scriptDir, example);
+      let basePath = "";
+
+      if (new URL(import.meta.url).protocol === "file:") {
+        basePath = join(dirname(fileURLToPath(import.meta.url)), example);
+      } else if (new URL(import.meta.url).protocol === "https:") {
+        basePath = new URL(example, import.meta.url).toString();
+      }
 
       createFiles(basePath, join(Deno.cwd(), name));
     } catch (err) {
