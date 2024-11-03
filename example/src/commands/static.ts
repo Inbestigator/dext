@@ -12,7 +12,7 @@ let num = 0;
 export default function staticCmd(interaction: CommandInteraction) {
   num++;
   interaction.reply({
-    content: `I've been validated ${num} times!`,
+    content: `I've been validated ${num} time${num === 1 ? "" : "s"}!`,
     ephemeral: true,
   });
 }
