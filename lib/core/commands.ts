@@ -90,7 +90,7 @@ export default async function setupCommands(
     await client.application?.commands.set(commands);
 
     try {
-      await Deno.mkdir("./.dext/commands");
+      await Deno.mkdir("./.dext/commands", { recursive: true });
     } catch (err) {
       if (!(err instanceof Deno.errors.AlreadyExists)) {
         throw err;
@@ -229,7 +229,16 @@ async function fetchCommands() {
 }
 
 function readdir(path: string) {
-  const files = Deno.readDirSync(path);
+  let files;
+
+  try {
+    files = Deno.readDirSync(path);
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) {
+      console.warn(" \x1b[33m!\x1b[0m", `src/commands directory not found`);
+    }
+    return [];
+  }
   const commands: string[] = [];
   for (const file of files) {
     if (file.isDirectory) {

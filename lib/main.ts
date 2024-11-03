@@ -85,8 +85,7 @@ program
         : "https://api.github.com/repos/Inbestigator/dext/contents/templates/base";
 
       createFiles(path, join(Deno.cwd(), name));
-    } catch (err) {
-      console.log(err);
+    } catch {
       mkdirLoader.error();
       Deno.exit(1);
     }
@@ -122,15 +121,6 @@ export default async function createInstance() {
     throw new Error(
       "No bot token provided, make sure to provide a TOKEN environment variable",
     );
-  }
-
-  try {
-    await Deno.mkdir("./.dext");
-  } catch (err) {
-    if (!(err instanceof Deno.errors.AlreadyExists)) {
-      initLoader.error();
-      throw err;
-    }
   }
 
   initLoader.resolve();
