@@ -1,3 +1,4 @@
+import "@std/dotenv/load";
 import { Client } from "discord.js";
 import setupCommands from "./core/commands.ts";
 import loader from "./internal/loader.ts";
@@ -11,7 +12,7 @@ const program = new Command();
 program.name("dext").description("Compile Discord.js commands at build time.");
 
 program
-  .command("dev1")
+  .command("dev")
   .description("Starts the bot in development mode.")
   .action(async () => {
     await createInstance();

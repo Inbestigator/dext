@@ -1,11 +1,9 @@
 {
   "tasks": {
-    "main": "deno run -A ./dext.config.ts"
+    "dev": "deno run -A ../lib/main.ts dev"
   },
   "imports": {
     "discord.js": "npm:discord.js@^14.16.3",
-    "@std/fmt": "jsr:@std/fmt@^1.0.3",
-    "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
-    "@inbestigator/dext": "jsr:@inbestigator/dext@^0.1.6"
+    "@inbestigator/dext": "jsr:@inbestigator/dext@^0.2.3"
   }
 }
