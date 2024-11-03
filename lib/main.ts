@@ -4,7 +4,6 @@ import setupCommands from "./core/commands.ts";
 import loader from "./internal/loader.ts";
 import type { DextConfig } from "./internal/types.ts";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import authorize from "./core/authorize.ts";
 import { Command } from "commander";
 
@@ -49,40 +48,43 @@ program
     }
     const mkdirLoader = loader(`Creating files for project: ${name}`);
 
-    function createFiles(path: string, dest: string) {
-      const contents = Deno.readDirSync(path);
-
+    async function createFiles(path: string, dest: string) {
       Deno.mkdirSync(dest, { recursive: true });
+      const response = await fetch(path);
 
-      for (const file of contents) {
-        const sourcePath = join(path, file.name);
-        let destPath = join(dest, file.name);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
 
-        if (file.isDirectory) {
-          createFiles(sourcePath, destPath);
-        } else {
-          let fileContents = Deno.readTextFileSync(sourcePath);
-          if (file.name === ".env.example" && token) {
-            fileContents = `TOKEN="${token}"`;
-            destPath = join(dest, ".env");
+      const json = await response.json();
+      if (Array.isArray(json)) {
+        for (const file of json) {
+          if (file.type === "dir") {
+            createFiles(file.url, join(dest, file.name));
+          } else {
+            const fileRes = await fetch(file.download_url);
+            if (!fileRes.ok) {
+              throw new Error(fileRes.statusText);
+            }
+            let fileContents = await fileRes.text();
+            let destPath = join(dest, file.name);
+            if (file.name === ".env.example" && token) {
+              fileContents = `TOKEN="${token}"`;
+              destPath = join(dest, ".env");
+            }
+            Deno.mkdirSync(dirname(destPath), { recursive: true });
+            Deno.writeTextFileSync(destPath, fileContents);
           }
-          Deno.writeTextFileSync(destPath, fileContents);
         }
       }
     }
 
     try {
-      const template = simple ? "../templates/simple" : "../templates/base";
+      const path = simple
+        ? "https://api.github.com/repos/Inbestigator/dext/contents/templates/simple"
+        : "https://api.github.com/repos/Inbestigator/dext/contents/templates/base";
 
-      let basePath = "";
-
-      if (new URL(import.meta.url).protocol === "file:") {
-        basePath = join(dirname(fileURLToPath(import.meta.url)), template);
-      } else if (new URL(import.meta.url).protocol === "https:") {
-        basePath = new URL(template, import.meta.url).toString();
-      }
-
-      createFiles(basePath, join(Deno.cwd(), name));
+      createFiles(path, join(Deno.cwd(), name));
     } catch (err) {
       console.log(err);
       mkdirLoader.error();
