@@ -1,5 +1,5 @@
 import { Client } from "discord.js";
-import "jsr:@std/dotenv/load";
+import "@std/dotenv/load";
 import setupCommands from "./internal/commands.ts";
 import loader from "./internal/loader.ts";
 import type { DextConfig } from "./internal/types.ts";
