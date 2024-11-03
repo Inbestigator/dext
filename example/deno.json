@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run -A ../lib/internal/client.ts"
+    "main": "deno run -A ./dext.config.ts"
   },
   "imports": {
     "discord.js": "npm:discord.js@^14.16.3",
