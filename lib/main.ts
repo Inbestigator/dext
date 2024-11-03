@@ -1,10 +1,10 @@
 import { Client } from "discord.js";
-import "@std/dotenv/load";
-import setupCommands from "./internal/commands.ts";
+import "jsr:@std/dotenv/load";
+import setupCommands from "./core/commands.ts";
 import loader from "./internal/loader.ts";
 import type { DextConfig } from "./internal/types.ts";
 import { join } from "node:path";
-import authorize from "./internal/authorize.ts";
+import authorize from "./core/authorize.ts";
 
 /**
  * Creates a new Dext instance of your bot.

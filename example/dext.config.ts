@@ -1,4 +1,5 @@
-import createInstance, { type DextConfig } from "@inbestigator/dext";
+import type { DextConfig } from "@inbestigator/dext";
+import createInstance from "../lib/main.ts";
 
 createInstance();
 

@@ -63,3 +63,32 @@ export interface Command {
    */
   revalidate?: number;
 }
+
+export interface Component {
+  /**
+   * Name of component, internal
+   */
+  name: string;
+
+  /**
+   * Type of component, internal
+   */
+  type: number;
+
+  /**
+   * Internal runner
+   */
+  default: (interaction: CommandInteraction, client: Client) => unknown;
+
+  /**
+   * If the component is pregenerated
+   */
+  pregenerated?: boolean;
+
+  /**
+   * How long to cache this static component before revalidating.
+   *
+   * **Overrides `cacheExpiry` config**
+   */
+  revalidate?: number;
+}
