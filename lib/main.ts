@@ -1,10 +1,24 @@
 import { Client } from "discord.js";
-import "@std/dotenv/load";
 import setupCommands from "./core/commands.ts";
 import loader from "./internal/loader.ts";
 import type { DextConfig } from "./internal/types.ts";
 import { join } from "node:path";
 import authorize from "./core/authorize.ts";
+import Denomander from "https://deno.land/x/denomander/mod.ts";
+
+const program = new Denomander({
+  app_name: "dext",
+  app_description: "Compile Discord.js commands at build time.",
+});
+
+program
+  .command("dev1")
+  .description("Starts the bot in development mode.")
+  .action(async () => {
+    await createInstance();
+  });
+
+program.parse(Deno.args);
 
 /**
  * Creates a new Dext instance of your bot.
