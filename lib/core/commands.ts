@@ -1,167 +1,16 @@
 import type {
-  // @ts-ignore Type not found
-  APIModalInteractionResponseCallbackData,
   Client,
   CommandInteraction,
-  InteractionReplyOptions,
-  // @ts-ignore Type not found
-  JSONEncodable,
-  ModalComponentData,
+  MessageComponentInteraction,
 } from "discord.js";
 import type { Command, DextConfig } from "../internal/types.ts";
 import { join } from "node:path";
 import { underline } from "@std/fmt/colors";
 import loader from "../internal/loader.ts";
 import type { CommandData } from "../exports.ts";
-
-type ValidResponse =
-  | "reply"
-  | "deferReply"
-  | "deleteReply"
-  | "editReply"
-  | "followUp"
-  | "showModal";
-
-const validResponses: ValidResponse[] = [
-  "reply",
-  "deferReply",
-  "deleteReply",
-  "editReply",
-  "followUp",
-  "showModal",
-];
-
-type InteractionReply = string | InteractionReplyOptions;
-
-interface CachedResponse {
-  reply:
-    | InteractionReply
-    | null
-    | {
-      deferred: true;
-      ephemeral?: boolean;
-    }
-    | {
-      modal: true;
-      data:
-        | JSONEncodable<APIModalInteractionResponseCallbackData>
-        | ModalComponentData
-        | APIModalInteractionResponseCallbackData;
-    };
-  followUps: InteractionReply[];
-}
-
-interface InteractionMock extends CommandInteraction {
-  response: () => CachedResponse;
-}
-
-function createInteractionMock(
-  command: Command,
-  interaction?: CommandInteraction,
-): InteractionMock {
-  const actions: {
-    type: ValidResponse;
-    data: unknown;
-  }[] = [];
-
-  const handler = {
-    get(target: InteractionMock, prop: ValidResponse) {
-      if ((prop as string) === "response") {
-        return target.response;
-      }
-      if (validResponses.includes(prop)) {
-        return (data: unknown) => {
-          actions.push({
-            type: prop,
-            data,
-          });
-          if (!interaction) {
-            return () => {};
-          }
-          return (interaction[prop] as (data: unknown) => unknown).apply(
-            interaction,
-            [data],
-          );
-        };
-      } else {
-        if (command.pregenerated !== true) {
-          throw new Error();
-        } else {
-          console.warn(
-            " \x1b[33m!\x1b[0m",
-            `Explicitly static command "${command.name}" tries to access dynamic property "${prop}"`,
-          );
-          return target[prop] ?? false;
-        }
-      }
-    },
-  };
-
-  const mock = {
-    ...interaction,
-    response: () => {
-      const finalActions: CachedResponse = {
-        reply: null,
-        followUps: [],
-      };
-      for (const action of actions) {
-        switch (action.type) {
-          case "reply":
-            finalActions.reply = action.data as InteractionReply;
-            break;
-          case "deferReply":
-            finalActions.reply = {
-              deferred: true,
-              ...(action.data as { ephemeral?: boolean }),
-            };
-            break;
-          case "deleteReply":
-            finalActions.reply = null;
-            break;
-          case "editReply":
-            if (
-              finalActions.reply &&
-              typeof finalActions.reply === "object" &&
-              "deferred" in finalActions.reply
-            ) {
-              switch (typeof action.data) {
-                case "string":
-                  finalActions.reply = {
-                    content: action.data,
-                    ephemeral: finalActions.reply.ephemeral,
-                  };
-                  break;
-                case "object":
-                  finalActions.reply = {
-                    ...action.data,
-                    ephemeral: finalActions.reply.ephemeral,
-                  };
-                  break;
-              }
-              break;
-            }
-            finalActions.reply = action.data as InteractionReply;
-            break;
-          case "followUp":
-            finalActions.followUps.push(action.data as InteractionReply);
-            break;
-          case "showModal":
-            finalActions.reply = {
-              modal: true,
-              data: action.data as
-                | JSONEncodable<APIModalInteractionResponseCallbackData>
-                | ModalComponentData
-                | APIModalInteractionResponseCallbackData,
-            };
-            break;
-        }
-      }
-      return finalActions;
-    },
-  } as InteractionMock;
-
-  return new Proxy(mock, handler);
-}
+import createSpyInteraction, {
+  type CachedResponse,
+} from "../internal/spyInteraction.ts";
 
 async function validateAndCache(
   command: Command,
@@ -202,7 +51,10 @@ async function validateAndCache(
     // pass
   }
 
-  const interactionMock = createInteractionMock(command, interaction);
+  const interactionMock = createSpyInteraction<CommandInteraction>(
+    command,
+    interaction,
+  );
 
   await Promise.resolve(command.default(interactionMock, client));
 
@@ -247,7 +99,9 @@ export default async function setupCommands(
 
     const generatedResults = await Promise.all(
       commands.map(async (command, i) => {
-        const interactionMock = createInteractionMock(command);
+        const interactionMock = createSpyInteraction<CommandInteraction>(
+          command,
+        );
 
         try {
           const result = await Promise.resolve(
@@ -350,7 +204,10 @@ async function fetchCommands() {
   for (const commandName of commandNames) {
     const commandModule = (await import(commandName)) as {
       config?: CommandData;
-      default: (interaction: CommandInteraction, client: Client) => unknown;
+      default: (
+        interaction: CommandInteraction | MessageComponentInteraction,
+        client: Client,
+      ) => unknown;
     };
     const command: Command = {
       name: commandName

@@ -3,7 +3,8 @@
 Compile Discord.js commands at build time.
 
 > [!IMPORTANT]\
-> In order to run commands like `dext dev`, you must install Dext with
+> In order to run commands like `dext dev`, you must also install Dext globally
+> with
 >
 > ```bash
 > deno install -A -g -n dext jsr:@inbestigator/dext
