@@ -10,7 +10,7 @@ import type {
 } from "discord.js";
 import type { Command, DextConfig } from "../internal/types.ts";
 import { join } from "node:path";
-import { underline } from "jsr:@std/fmt/colors";
+import { underline } from "@std/fmt/colors";
 import loader from "../internal/loader.ts";
 import type { CommandData } from "../exports.ts";
 
