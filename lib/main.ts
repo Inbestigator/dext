@@ -29,10 +29,10 @@ program
 program
   .command("create-new")
   .description("Create a new Dext bootstrapped bot.")
-  .option("-n, --name <name>", "Project name")
+  .argument("[name]", "Project name")
   .option("-t, --token <token>", "Bot token")
   .option("-s, --simple", "Use a simple template")
-  .action(({ name, token, simple }) => {
+  .action((name, { token, simple }) => {
     if (!name) {
       name = prompt("Project name:");
     }
