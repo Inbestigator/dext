@@ -1,6 +1,4 @@
-# Simple Dext example
-
-This example comes with a dynamic and a static command.
+# Base Dext template
 
 Run these commands to start the bot the first time
 

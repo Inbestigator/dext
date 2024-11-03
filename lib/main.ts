@@ -32,7 +32,7 @@ program
   .description("Create a new Dext bootstrapped bot.")
   .option("-n, --name <name>", "Project name")
   .option("-t, --token <token>", "Bot token")
-  .option("-s, --simple", "Use a simple example")
+  .option("-s, --simple", "Use a simple template")
   .action(({ name, token, simple }) => {
     if (!name) {
       name = prompt("Project name:");
@@ -45,7 +45,7 @@ program
       token = prompt("Bot token (optional in this process):");
     }
     if (simple === undefined) {
-      simple = confirm("Do you want to use a simple example?");
+      simple = confirm("Do you want to use a simple template?");
     }
     const mkdirLoader = loader(`Creating files for project: ${name}`);
 
@@ -72,14 +72,14 @@ program
     }
 
     try {
-      const example = simple ? "../examples/simple" : "../examples/base";
+      const template = simple ? "../templates/simple" : "../templates/base";
 
       let basePath = "";
 
       if (new URL(import.meta.url).protocol === "file:") {
-        basePath = join(dirname(fileURLToPath(import.meta.url)), example);
+        basePath = join(dirname(fileURLToPath(import.meta.url)), template);
       } else if (new URL(import.meta.url).protocol === "https:") {
-        basePath = new URL(example, import.meta.url).toString();
+        basePath = new URL(template, import.meta.url).toString();
       }
 
       createFiles(basePath, join(Deno.cwd(), name));
