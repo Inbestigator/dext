@@ -3,7 +3,8 @@ import { Client } from "discord.js";
 import setupCommands from "./core/commands.ts";
 import loader from "./internal/loader.ts";
 import type { DextConfig } from "./internal/types.ts";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import authorize from "./core/authorize.ts";
 import { Command } from "commander";
 
@@ -15,103 +16,77 @@ program
   .command("dev")
   .description("Starts the bot in development mode.")
   .action(async () => {
+    Deno.env.set("DEXT_ENV", "development");
+    await createInstance();
+  });
+
+program
+  .command("build")
+  .description("Build the bot's files in production mode.")
+  .action(async () => {
     await createInstance();
   });
 
 program
   .command("create-new")
   .description("Create a new Dext bootstrapped bot.")
-  .action(async () => {
-    const projectName = prompt("Project name:");
-    if (!projectName) {
-      console.log("Project name cannot be empty.");
-      return;
+  .option("-n, --name <name>", "Project name")
+  .option("-t, --token <token>", "Bot token")
+  .option("-s, --simple", "Use a simple example")
+  .action(({ name, token, simple }) => {
+    if (!name) {
+      name = prompt("Project name:");
     }
-    const token = prompt("Bot token (optional in this process):");
-    const mkdirLoader = loader(`Creating files for project: ${projectName}`);
+    if (!name) {
+      console.log("Project name cannot be empty.");
+      Deno.exit(1);
+    }
+    if (!token) {
+      token = prompt("Bot token (optional in this process):");
+    }
+    if (simple === undefined) {
+      simple = confirm("Do you want to use a simple example?");
+    }
+    const mkdirLoader = loader(`Creating files for project: ${name}`);
+
+    function createFiles(path: string, dest: string) {
+      const contents = Deno.readDirSync(path);
+
+      Deno.mkdirSync(dest, { recursive: true });
+
+      for (const file of contents) {
+        const sourcePath = join(path, file.name);
+        let destPath = join(dest, file.name);
+
+        if (file.isDirectory) {
+          createFiles(sourcePath, destPath);
+        } else {
+          let fileContents = Deno.readTextFileSync(sourcePath);
+          if (file.name === ".env.example" && token) {
+            fileContents = `TOKEN="${token}"`;
+            destPath = join(dest, ".env");
+          }
+          Deno.writeTextFileSync(destPath, fileContents);
+        }
+      }
+    }
 
     try {
-      const config = `import type { DextConfig } from "@inbestigator/dext";
+      const example = simple ? "../examples/simple" : "../examples/base";
 
-const config: DextConfig = {
-  client: { intents: [] },
-  clientId: "", // Reccomended to replace with your bot's client ID
-};
+      const scriptDir = dirname(fileURLToPath(import.meta.url));
+      const basePath = join(scriptDir, example);
 
-export default config;
-`;
-
-      const dynamicCmd = `import type { CommandInteraction } from "discord.js";
-import type { CommandData } from "@inbestigator/dext";
-
-export const config: CommandData = {
-  description: "Returns a greeting",
-  options: [],
-};
-
-export default function dynamicCmd(interaction: CommandInteraction) {
-  interaction.reply({
-    content: \`Hey there, \${interaction.user.displayName}!\`,
-    ephemeral: true,
-  });
-}
-`;
-
-      const staticCmd = `import type { CommandInteraction } from "discord.js";
-import type { CommandData } from "@inbestigator/dext";
-
-export const config: CommandData = {
-  description: "Shows how a pregenerated command doesn't run every time",
-  options: [],
-  revalidate: 5000,
-};
-
-let num = 0;
-
-export default function staticCmd(interaction: CommandInteraction) {
-  num++;
-  interaction.reply(\`I've been validated \${num} time\${num === 1 ? "" : "s"}!\`);
-}
-`;
-
-      const env = `${
-        !token ? "# Add your bot's token here\n" : ""
-      }TOKEN="${token}"`;
-
-      const deno = {
-        imports: {
-          "discord.js": "npm:discord.js",
-          "@inbestigator/dext": "jsr:@inbestigator/dext",
-        },
-      };
-
-      await Deno.mkdir(`./${projectName}`);
-      await Deno.mkdir(`./${projectName}/src`);
-      await Deno.mkdir(`./${projectName}/src/commands`);
-      await Deno.mkdir(`./${projectName}/src/components`);
-      await Deno.writeTextFile(`./${projectName}/README.md`, "");
-      await Deno.writeTextFile(
-        `./${projectName}/deno.json`,
-        JSON.stringify(deno),
-      );
-      await Deno.writeTextFile(`./${projectName}/.env`, env);
-      await Deno.writeTextFile(`./${projectName}/dext.config.ts`, config);
-      await Deno.writeTextFile(
-        `./${projectName}/src/commands/dynamic.ts`,
-        dynamicCmd,
-      );
-      await Deno.writeTextFile(
-        `./${projectName}/src/commands/static.ts`,
-        staticCmd,
-      );
-    } catch {
+      createFiles(basePath, join(Deno.cwd(), name));
+    } catch (err) {
+      console.log(err);
       mkdirLoader.error();
-      return;
+      Deno.exit(1);
     }
     mkdirLoader.resolve();
 
     console.log(
-      `Project created successfully. Please run\n$ cd ${projectName}${
+      `Project created successfully. Please run\n$ cd ${name}${
         !token ? "\nAdd your bot's token to .env" : ""
       }\n$ deno install\n$ dext dev`,
     );
@@ -160,6 +135,10 @@ export default async function createInstance() {
   });
 
   await setupCommands(client, config);
+
+  if (Deno.env.get("DEXT_ENV") !== "development") {
+    Deno.exit(0);
+  }
 
   async function fetchConfig(): Promise<DextConfig | null> {
     const configPath = join("file://", Deno.cwd(), "dext.config.ts");
