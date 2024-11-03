@@ -1,7 +1,11 @@
-import type { DextConfig } from "../lib/exports.ts";
+import createInstance, { type DextConfig } from "@inbestigator/dext";
 
-export default {
+createInstance();
+
+const config: DextConfig = {
   client: { intents: [] },
   clientId: "",
   cacheExpiry: 60000,
-} satisfies DextConfig;
+};
+
+export default config;

@@ -3,6 +3,7 @@
     "dev": "deno run -A ../lib/internal/client.ts"
   },
   "imports": {
-    "discord.js": "npm:discord.js@^14.16.3"
+    "discord.js": "npm:discord.js@^14.16.3",
+    "@inbestigator/dext": "jsr:@inbestigator/dext@^0.1.3"
   }
 }

@@ -97,25 +97,11 @@ export default async function setupCommands(
   client: Client,
   config: DextConfig,
 ) {
-  const commands = await fetchCommands();
-
-  await client.application?.commands.set(commands);
-
   const generatingLoader = loader("Generating commands");
-
-  try {
-    await Deno.mkdir("./.dext/commands");
-  } catch (err) {
-    if (!(err instanceof Deno.errors.AlreadyExists)) {
-      throw err;
-    }
-  }
-
-  const totalCommands = commands.length;
   let generatedN = 0;
   const generatedStr: string[][] = [[underline("\nCommand")]];
 
-  function sendType(name: string, isPregen: boolean) {
+  function sendType(name: string, isPregen: boolean, totalCommands: number) {
     generatedN++;
     generatedStr.push([
       generatedN === 1 ? "┌" : totalCommands === generatedN ? "└" : "├",
@@ -123,91 +109,109 @@ export default async function setupCommands(
       name,
     ]);
   }
-  const generatedResults = await Promise.all(
-    commands.map(async (command, i) => {
-      const interactionMock = createInteractionMock(command);
 
-      try {
-        const result = await Promise.resolve(
-          command.default(interactionMock, client),
-        );
-        if (result instanceof Promise) {
-          throw new Error();
-        }
-      } catch {
-        // pass
+  try {
+    const commands = await fetchCommands();
+
+    await client.application?.commands.set(commands);
+
+    try {
+      await Deno.mkdir("./.dext/commands");
+    } catch (err) {
+      if (!(err instanceof Deno.errors.AlreadyExists)) {
+        throw err;
       }
+    }
 
-      const response = interactionMock.response;
-
-      if (
-        (!response && command.pregenerated !== true) ||
-        command.pregenerated === false
-      ) {
-        sendType(command.name, false);
-        commands[i].pregenerated = false;
-        return false;
-      }
-
-      sendType(command.name, true);
-      Deno.writeTextFileSync(
-        `./.dext/commands/${command.name}.json`,
-        JSON.stringify({
-          response,
-          stamp: Date.now(),
-        }),
-      );
-      commands[i].pregenerated = true;
-
-      return true;
-    }),
-  );
-
-  generatingLoader.resolve();
-
-  console.log(generatedStr.map((row) => row.join(" ")).join("\n"));
-  console.info(
-    `\n${
-      generatedResults.includes(true)
-        ? "\n○  (Static) preran as static responses"
-        : ""
-    }${
-      generatedResults.includes(false)
-        ? "\nƒ  (Dynamic)  re-evaluated every interaction"
-        : ""
-    }`,
-  );
-
-  client.on(
-    "interactionCreate",
-    (interaction) =>
-      void (async () => {
-        if (!interaction.isCommand()) return;
-
-        const command = commands.find(
-          (c) => c.name === interaction.commandName,
-        );
-
-        if (!command) {
-          return;
-        }
+    const generatedResults = await Promise.all(
+      commands.map(async (command, i) => {
+        const interactionMock = createInteractionMock(command);
 
         try {
-          if (command.pregenerated === true) {
-            await validateAndCache(
-              command,
-              interaction,
-              client,
-              config.cacheExpiry ?? 24 * 60 * 60 * 1000,
-            );
-          } else {
-            await command.default(interaction, client);
+          const result = await Promise.resolve(
+            command.default(interactionMock, client),
+          );
+          if (result instanceof Promise) {
+            throw new Error();
           }
-        } catch (error) {
-          console.error(`Failed to run command "${command.name}":`, error);
+        } catch {
+          // pass
         }
-      })(),
-  );
+
+        const response = interactionMock.response;
+
+        if (
+          (!response && command.pregenerated !== true) ||
+          command.pregenerated === false
+        ) {
+          sendType(command.name, false, commands.length);
+          commands[i].pregenerated = false;
+          return false;
+        }
+
+        sendType(command.name, true, commands.length);
+        Deno.writeTextFileSync(
+          `./.dext/commands/${command.name}.json`,
+          JSON.stringify({
+            response,
+            stamp: Date.now(),
+          }),
+        );
+        commands[i].pregenerated = true;
+
+        return true;
+      }),
+    );
+
+    generatingLoader.resolve();
+
+    console.log(generatedStr.map((row) => row.join(" ")).join("\n"));
+    console.info(
+      `\n${
+        generatedResults.includes(true)
+          ? "\n○  (Static) preran as static responses"
+          : ""
+      }${
+        generatedResults.includes(false)
+          ? "\nƒ  (Dynamic)  re-evaluated every interaction"
+          : ""
+      }`,
+    );
+
+    client.on(
+      "interactionCreate",
+      (interaction) =>
+        void (async () => {
+          if (!interaction.isCommand()) return;
+
+          const command = commands.find(
+            (c) => c.name === interaction.commandName,
+          );
+
+          if (!command) {
+            return;
+          }
+
+          try {
+            if (command.pregenerated === true) {
+              await validateAndCache(
+                command,
+                interaction,
+                client,
+                config.cacheExpiry ?? 24 * 60 * 60 * 1000,
+              );
+            } else {
+              await command.default(interaction, client);
+            }
+          } catch (error) {
+            console.error(`Failed to run command "${command.name}":`, error);
+          }
+        })(),
+    );
+  } catch {
+    generatingLoader.error();
+    Deno.exit(1);
+  }
 }
 
 async function fetchCommands() {
