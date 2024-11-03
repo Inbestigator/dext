@@ -72,11 +72,11 @@ async function validateAndCache(
   }
 
   const originalReply = interaction.reply;
-  let response: string = "";
+  let response: InteractionReplyOptions | null = null;
 
   // @ts-expect-error Weird error
   interaction.reply = (options: InteractionReplyOptions) => {
-    response = JSON.stringify(options);
+    response = options;
     return originalReply.apply(interaction, [options]);
   };
 
