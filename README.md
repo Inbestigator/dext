@@ -10,6 +10,12 @@ Compile Discord.js commands at build time.
 > deno install -A -g -n dext jsr:@inbestigator/dext
 > ```
 
+To automagically create a Dext bootstrapped bot, run the command
+
+```bash
+dext create-new
+```
+
 ```ts
 import type { CommandInteraction } from "discord.js";
 import type { CommandData } from "@inbestigator/dext";

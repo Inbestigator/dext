@@ -8,7 +8,7 @@ import type {
   MessageComponentInteraction,
   ModalComponentData,
 } from "discord.js";
-import type { Command, Component } from "../internal/types.ts";
+import type { Command, Component } from "./types.ts";
 
 const allValidResponses = [
   "reply",

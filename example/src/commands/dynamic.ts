@@ -4,7 +4,6 @@ import type { CommandData } from "@inbestigator/dext";
 export const config: CommandData = {
   description: "Returns a greeting",
   options: [],
-  pregenerated: true,
 };
 
 export default function dynamicCmd(interaction: CommandInteraction) {

@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "dev": "deno run -A ../lib/main.ts dev"
+    "dev": "deno run -A ../lib/main.ts dev",
+    "create-new": "deno run -A ../lib/main.ts create-new"
   },
   "imports": {
     "discord.js": "npm:discord.js@^14.16.3",
