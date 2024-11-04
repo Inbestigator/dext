@@ -7,8 +7,10 @@ import { dirname, join } from "node:path";
 import authorize from "./core/authorize.ts";
 import { Command } from "commander";
 import setupComponents from "./core/components.ts";
+import { delay } from "@std/async/delay";
 
 const program = new Command();
+let readyToReload = false;
 
 program.name("dext").description("Compile Discord.js commands at build time.");
 
@@ -132,11 +134,30 @@ export default async function createInstance() {
     loader(`Logged in as ${client.user?.displayName}`).resolve();
   });
 
-  await setupCommands(client, config);
-  await setupComponents(client, config);
+  await reloadGenerators();
 
   if (Deno.env.get("DEXT_ENV") !== "development") {
     Deno.exit(0);
+  } else {
+    const watcher = Deno.watchFs(Deno.cwd());
+    for await (const event of watcher) {
+      if (
+        (event.kind === "modify" ||
+          event.kind === "create" ||
+          event.kind === "remove") &&
+        readyToReload
+      ) {
+        if (
+          !event.paths.some((path) => path.includes(".dext")) &&
+          readyToReload
+        ) {
+          readyToReload = false;
+          console.log("File change detected");
+          await delay(500);
+          reloadGenerators();
+        }
+      }
+    }
   }
 
   async function fetchConfig(): Promise<DextConfig | null> {
@@ -153,5 +174,30 @@ export default async function createInstance() {
       console.error("Error loading dext.config.ts:", error);
       return null;
     }
+  }
+
+  async function reloadGenerators() {
+    if (!config) return;
+
+    try {
+      Deno.removeSync("./.dext/commands", { recursive: true });
+      Deno.removeSync("./.dext/components", { recursive: true });
+    } catch {
+      // pass
+    }
+
+    setTimeout(() => {
+      if (!readyToReload) {
+        console.log(
+          "\n \x1b[33m!\x1b[0m",
+          "This is taking a while to generate, if it hangs too long, try restarting the process. This is usually just caused by Discord API rate limits.",
+        );
+      }
+    }, 5000);
+
+    await setupCommands(client, config);
+    await setupComponents(client, config);
+
+    readyToReload = true;
   }
 }

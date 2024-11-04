@@ -1,9 +1,4 @@
-import {
-  ActionRowBuilder,
-  type MessageComponentInteraction,
-  ModalBuilder,
-  TextInputBuilder,
-} from "discord.js";
+import type { MessageComponentInteraction } from "npm:discord.js";
 import type { ComponentData } from "@inbestigator/dext";
 
 export const config: ComponentData = {
@@ -11,21 +6,22 @@ export const config: ComponentData = {
 };
 
 export default function staticButton(interaction: MessageComponentInteraction) {
-  const modal = new ModalBuilder()
-    .setTitle(
-      "The only dynamic part of this flow is the response from this modal",
-    )
-    .setCustomId("echo-modal")
-    .addComponents(
-      new ActionRowBuilder<TextInputBuilder>({
+  interaction.showModal({
+    customId: "echo-modal",
+    title: "Echo Modal",
+    components: [
+      {
+        type: 1,
         components: [
-          new TextInputBuilder()
-            .setCustomId("echo")
-            .setPlaceholder("I'll repeat whatever you say")
-            .setLabel("Echo me")
-            .setStyle(1),
+          {
+            type: 4,
+            customId: "echo",
+            placeholder: "I'll repeat whatever you say",
+            label: "Echo me",
+            style: 1,
+          },
         ],
-      }),
-    );
-  interaction.showModal(modal);
+      },
+    ],
+  });
 }

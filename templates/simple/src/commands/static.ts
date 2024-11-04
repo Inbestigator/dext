@@ -1,8 +1,4 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  type CommandInteraction,
-} from "discord.js";
+import type { CommandInteraction } from "npm:discord.js";
 import type { CommandData } from "@inbestigator/dext";
 
 export const config: CommandData = {
@@ -12,11 +8,6 @@ export const config: CommandData = {
 };
 
 let num = 0;
-const wowButton = new ButtonBuilder()
-  .setCustomId("static")
-  .setLabel("Wow!")
-  .setStyle(1);
-
 export default function staticCmd(interaction: CommandInteraction) {
   num++;
 
@@ -24,9 +15,17 @@ export default function staticCmd(interaction: CommandInteraction) {
     content: `I've been validated ${num} time${num === 1 ? "" : "s"}!`,
     ephemeral: true,
     components: [
-      new ActionRowBuilder<ButtonBuilder>({
-        components: [wowButton],
-      }),
+      {
+        type: 1,
+        components: [
+          {
+            type: 2,
+            customId: "static",
+            style: 1,
+            label: "Wow!",
+          },
+        ],
+      },
     ],
   });
 }
