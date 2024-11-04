@@ -8,6 +8,7 @@ import authorize from "./core/authorize.ts";
 import { Command } from "commander";
 import setupComponents from "./core/components.ts";
 import { delay } from "@std/async/delay";
+import setupEvents from "./core/events.ts";
 
 const program = new Command();
 let readyToReload = false;
@@ -186,18 +187,33 @@ export default async function createInstance() {
       // pass
     }
 
-    setTimeout(() => {
-      if (!readyToReload) {
-        console.log(
-          "\n \x1b[33m!\x1b[0m",
-          "This is taking a while to generate, if it hangs too long, try restarting the process. This is usually just caused by Discord API rate limits.",
-        );
-      }
-    }, 5000);
-
+    startTimeoutWarning();
     await setupCommands(client, config);
+    resetTimeoutWarning();
     await setupComponents(client, config);
+    resetTimeoutWarning();
+    await setupEvents(client);
 
     readyToReload = true;
   }
+}
+
+let timeout: number | null = null;
+
+function startTimeoutWarning() {
+  timeout = setTimeout(() => {
+    if (!readyToReload) {
+      console.log(
+        "\n \x1b[33m!\x1b[0m",
+        "This is taking a while to generate. If it hangs too long, try restarting the process. This is usually just caused by Discord API rate limits.",
+      );
+    }
+  }, 5000);
+}
+
+function resetTimeoutWarning() {
+  if (timeout !== null) {
+    clearTimeout(timeout);
+  }
+  startTimeoutWarning();
 }
