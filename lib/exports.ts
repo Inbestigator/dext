@@ -1,8 +1,8 @@
+import createInstance from "./core/instance.ts";
 import type {
   Command as CommandType,
   Component as ComponentType,
 } from "./internal/types.ts";
-import createInstance from "./main.ts";
 
 /**
  * Configuration for a specific command.
