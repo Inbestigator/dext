@@ -1,13 +1,13 @@
 # Dext
 
-Compile Discord.js commands at build time.
+Compile Discord.js interactions at build time.
 
 > [!IMPORTANT]\
-> In order to run commands like `dext dev`, you must also install Dext globally
-> with
+> In order to run commands like `dext dev` or `dext create-new`, you must also
+> install Dext globally with
 >
 > ```bash
-> deno install -f -r -A -g -n dext jsr:@inbestigator/dext
+> deno install -A -g jsr:@inbestigator/dext
 > ```
 
 To automagically create a Dext bootstrapped bot, run the command
