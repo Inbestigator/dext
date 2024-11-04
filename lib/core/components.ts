@@ -289,10 +289,17 @@ async function fetchComponents() {
       default: componentModule.default,
     };
 
-    if (componentData.find((c) => c.name === component.name)) {
+    if (
+      componentData.find(
+        (c) => c.name === component.name && c.category === category,
+      )
+    ) {
       console.warn(
         " \x1b[33m!\x1b[0m",
-        `Component "${component.name}" already exists, skipping the duplicate`,
+        `${
+          component.category.slice(0, 1).toUpperCase() +
+          component.category.split("s")[0].slice(1)
+        } component "${component.name}" already exists, skipping the duplicate`,
       );
       continue;
     }
