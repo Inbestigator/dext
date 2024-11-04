@@ -74,7 +74,13 @@ export default async function setupCommands(
   function sendType(name: string, isPregen: boolean, totalCommands: number) {
     generatedN++;
     generatedStr.push([
-      generatedN === 1 ? "┌" : totalCommands === generatedN ? "└" : "├",
+      totalCommands === 1
+        ? "-"
+        : generatedN === 1
+        ? "┌"
+        : totalCommands === generatedN
+        ? "└"
+        : "├",
       isPregen ? "○" : "ƒ",
       name,
     ]);
@@ -187,8 +193,9 @@ export default async function setupCommands(
           }
         })(),
     );
-  } catch {
+  } catch (e) {
     generatingLoader.error();
+    console.error(e);
     Deno.exit(1);
   }
 }

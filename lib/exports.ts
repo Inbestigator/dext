@@ -11,6 +11,9 @@ import createInstance from "./main.ts";
  */
 export interface CommandData extends Omit<CommandType, "name" | "default"> {}
 
+/**
+ * Configuration for a specific component.
+ */
 export interface ComponentData
   extends Omit<ComponentType, "name" | "default" | "category"> {}
 

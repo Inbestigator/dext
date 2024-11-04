@@ -14,13 +14,14 @@ import createSpyInteraction, {
 import type { ComponentData } from "../exports.ts";
 
 async function validateAndCache<
-  T extends MessageComponentInteraction | ModalSubmitInteraction
+  T extends MessageComponentInteraction | ModalSubmitInteraction,
 >(component: Component, interaction: T, client: Client, expiry: number) {
-  const cacheFilePath = `./.dext/components/${component.category}/${component.name}.json`;
+  const cacheFilePath =
+    `./.dext/components/${component.category}/${component.name}.json`;
 
   try {
     const { response, stamp } = JSON.parse(
-      new TextDecoder().decode(Deno.readFileSync(cacheFilePath))
+      new TextDecoder().decode(Deno.readFileSync(cacheFilePath)),
     ) as { response: CachedResponse; stamp: number };
 
     if (
@@ -61,13 +62,13 @@ async function validateAndCache<
     JSON.stringify({
       response: interactionMock.response(),
       stamp: Date.now(),
-    })
+    }),
   );
 }
 
 export default async function setupComponents(
   client: Client,
-  config: DextConfig
+  config: DextConfig,
 ) {
   const generatingLoader = loader("Generating components");
   let generatedN = 0;
@@ -77,11 +78,17 @@ export default async function setupComponents(
     name: string,
     category: string,
     isPregen: boolean,
-    totalComponents: number
+    totalComponents: number,
   ) {
     generatedN++;
     generatedStr.push([
-      generatedN === 1 ? "┌" : totalComponents === generatedN ? "└" : "├",
+      totalComponents === 1
+        ? "-"
+        : generatedN === 1
+        ? "┌"
+        : totalComponents === generatedN
+        ? "└"
+        : "├",
       isPregen ? "○" : "ƒ",
       name + ` (${category})`,
     ]);
@@ -100,12 +107,13 @@ export default async function setupComponents(
 
     const generatedResults = await Promise.all(
       components.map(async (component, i) => {
-        const interactionMock =
-          createSpyInteraction<MessageComponentInteraction>(component);
+        const interactionMock = createSpyInteraction<
+          MessageComponentInteraction
+        >(component);
 
         try {
           const result = await Promise.resolve(
-            component.default(interactionMock, client)
+            component.default(interactionMock, client),
           );
           if (result instanceof Promise) {
             component.pregenerated = false;
@@ -124,7 +132,7 @@ export default async function setupComponents(
             component.name,
             component.category,
             false,
-            components.length
+            components.length,
           );
           components[i].pregenerated = false;
           return false;
@@ -136,12 +144,12 @@ export default async function setupComponents(
           JSON.stringify({
             response,
             stamp: Date.now(),
-          })
+          }),
         );
         components[i].pregenerated = true;
 
         return true;
-      })
+      }),
     );
 
     generatingLoader.resolve();
@@ -156,7 +164,7 @@ export default async function setupComponents(
         generatedResults.includes(false)
           ? "\nƒ  (Dynamic)  re-evaluated every interaction"
           : ""
-      }`
+      }`,
     );
 
     client.on(
@@ -182,7 +190,7 @@ export default async function setupComponents(
           }
 
           const component = components.find(
-            (c) => c.name === interaction.customId && c.category === category
+            (c) => c.name === interaction.customId && c.category === category,
           );
 
           if (!component) {
@@ -190,7 +198,7 @@ export default async function setupComponents(
           }
 
           const componentLoader = loader(
-            `Running component "${component.name}"`
+            `Running component "${component.name}"`,
           );
 
           try {
@@ -199,7 +207,7 @@ export default async function setupComponents(
                 component,
                 interaction,
                 client,
-                config.cacheExpiry ?? 24 * 60 * 60 * 1000
+                config.cacheExpiry ?? 24 * 60 * 60 * 1000,
               );
             } else {
               await component.default(interaction, client);
@@ -210,14 +218,14 @@ export default async function setupComponents(
             console.error(
               " \x1b[31m✕\x1b[0m",
               `Error running component "${component.name}":`,
-              error
+              error,
             );
           }
-        })()
+        })(),
     );
   } catch (e) {
-    console.error(e);
     generatingLoader.error();
+    console.error(e);
     Deno.exit(1);
   }
 }
@@ -254,7 +262,7 @@ async function fetchComponents() {
       config?: ComponentData;
       default: (
         interaction: MessageComponentInteraction | ModalSubmitInteraction,
-        client: Client
+        client: Client,
       ) => unknown;
     };
 
@@ -265,7 +273,7 @@ async function fetchComponents() {
     if (!validComponentCategories.includes(category)) {
       console.warn(
         " \x1b[33m!\x1b[0m",
-        `Category for "${componentName}" could not be determined, skipping`
+        `Category for "${componentName}" could not be determined, skipping`,
       );
       continue;
     }
@@ -284,7 +292,7 @@ async function fetchComponents() {
     if (componentData.find((c) => c.name === component.name)) {
       console.warn(
         " \x1b[33m!\x1b[0m",
-        `Component "${component.name}" already exists, skipping the duplicate`
+        `Component "${component.name}" already exists, skipping the duplicate`,
       );
       continue;
     }

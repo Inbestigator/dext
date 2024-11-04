@@ -9,8 +9,9 @@ export default async function authorize(client: Client, token: string) {
   try {
     await client.login(token);
     authLoader.resolve();
-  } catch {
+  } catch (e) {
     authLoader.error();
+    console.error(e);
     Deno.exit(1);
   }
 }
