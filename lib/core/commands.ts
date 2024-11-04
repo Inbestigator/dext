@@ -1,8 +1,4 @@
-import type {
-  Client,
-  CommandInteraction,
-  MessageComponentInteraction,
-} from "discord.js";
+import type { Client, CommandInteraction } from "discord.js";
 import type { Command, DextConfig } from "../internal/types.ts";
 import { join } from "node:path";
 import { underline } from "@std/fmt/colors";
@@ -204,10 +200,7 @@ async function fetchCommands() {
   for (const commandName of commandNames) {
     const commandModule = (await import(commandName)) as {
       config?: CommandData;
-      default: (
-        interaction: CommandInteraction | MessageComponentInteraction,
-        client: Client,
-      ) => unknown;
+      default: (interaction: CommandInteraction, client: Client) => unknown;
     };
     const command: Command = {
       name: commandName
@@ -221,6 +214,14 @@ async function fetchCommands() {
       revalidate: commandModule.config?.revalidate,
       default: commandModule.default,
     };
+
+    if (commandData.find((c) => c.name === command.name)) {
+      console.warn(
+        " \x1b[33m!\x1b[0m",
+        `Command "${command.name}" already exists, skipping the duplicate`,
+      );
+      continue;
+    }
 
     commandData.push(command);
   }

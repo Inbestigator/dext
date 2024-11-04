@@ -7,20 +7,11 @@ import type {
   JSONEncodable,
   MessageComponentInteraction,
   ModalComponentData,
+  ModalSubmitInteraction,
 } from "discord.js";
 import type { Command, Component } from "./types.ts";
 
-const allValidResponses = [
-  "reply",
-  "deferReply",
-  "deleteReply",
-  "editReply",
-  "followUp",
-  "showModal",
-] as const;
-type ValidResponse = (typeof allValidResponses)[number];
-
-type InteractionReply = string | InteractionReplyOptions;
+export type InteractionReply = string | InteractionReplyOptions;
 
 export interface CachedResponse {
   reply:
@@ -41,8 +32,22 @@ export interface CachedResponse {
 }
 
 export default function createSpyInteraction<
-  T extends CommandInteraction | MessageComponentInteraction,
+  T extends
+    | CommandInteraction
+    | MessageComponentInteraction
+    | ModalSubmitInteraction,
 >(item: Command | Component, interaction?: T) {
+  const allValidResponses = [
+    "reply",
+    "deferReply",
+    "deleteReply",
+    "editReply",
+    "followUp",
+    "showModal",
+  ] as const;
+
+  type ValidResponse = (typeof allValidResponses)[number];
+
   const actions: {
     type: ValidResponse;
     data: unknown;
@@ -62,9 +67,11 @@ export default function createSpyInteraction<
           if (!interaction) {
             return () => {};
           }
-          return (
-            interaction[prop as ValidResponse] as (data: unknown) => unknown
-          ).apply(interaction, [data]);
+
+          const method = interaction[prop as keyof T];
+          if (typeof method === "function") {
+            return method.apply(interaction, [data]);
+          }
         };
       } else {
         if (item.pregenerated !== true) {

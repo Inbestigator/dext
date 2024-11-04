@@ -3,6 +3,8 @@ import type {
   Client,
   ClientOptions,
   CommandInteraction,
+  MessageComponentInteraction,
+  ModalSubmitInteraction,
 } from "discord.js";
 
 /**
@@ -71,14 +73,17 @@ export interface Component {
   name: string;
 
   /**
-   * Type of component, internal
+   * Category of component, internal
    */
-  type: number;
+  category: "buttons" | "modals" | "selects";
 
   /**
    * Internal runner
    */
-  default: (interaction: CommandInteraction, client: Client) => unknown;
+  default: (
+    interaction: MessageComponentInteraction | ModalSubmitInteraction,
+    client: Client,
+  ) => unknown;
 
   /**
    * If the component is pregenerated

@@ -6,6 +6,7 @@ import type { DextConfig } from "./internal/types.ts";
 import { dirname, join } from "node:path";
 import authorize from "./core/authorize.ts";
 import { Command } from "commander";
+import setupComponents from "./core/components.ts";
 
 const program = new Command();
 
@@ -132,6 +133,7 @@ export default async function createInstance() {
   });
 
   await setupCommands(client, config);
+  await setupComponents(client, config);
 
   if (Deno.env.get("DEXT_ENV") !== "development") {
     Deno.exit(0);
