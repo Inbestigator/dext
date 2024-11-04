@@ -98,7 +98,7 @@ program
     console.log(
       `Project created successfully. Please run\n$ cd ${name}${
         !token ? "\nAdd your bot's token to .env" : ""
-      }\n$ deno install\n$ dext dev`,
+      }\n$ dext dev`,
     );
   });
 

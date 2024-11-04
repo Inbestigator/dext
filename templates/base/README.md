@@ -1,8 +1,14 @@
-# Base Dext template
+This is an empty [Discord.js](https://discord.js.org) project bootstrapped with
+[`dext`](https://dext.vercel.app).
 
-Run these commands to start the bot the first time
+## Getting Started
+
+First, run the development bot:
 
 ```bash
-deno install
 dext dev
 ```
+
+You can check out
+[the Dext GitHub repository](https://github.com/inbestigator/dext) - your
+feedback and contributions are welcome!

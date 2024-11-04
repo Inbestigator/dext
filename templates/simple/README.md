@@ -1,10 +1,17 @@
-# Simple Dext template
+This is a simple [Discord.js](https://discord.js.org) project bootstrapped with
+[`dext`](https://dext.vercel.app).
 
-This template comes with a dynamic and a static command.
+## Getting Started
 
-Run these commands to start the bot the first time
+First, run the development bot:
 
 ```bash
-deno install
 dext dev
 ```
+
+You can edit your bot by modifying `src/commands/static.ts`. The bot
+auto-updates as you edit the files.
+
+You can check out
+[the Dext GitHub repository](https://github.com/inbestigator/dext) - your
+feedback and contributions are welcome!
