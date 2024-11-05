@@ -67,7 +67,11 @@ export default async function setupCommands(
   client: Client,
   config: DextConfig,
 ) {
-  const generatingLoader = loader("Generating commands");
+  const generatingLoader = loader(
+    `${
+      Deno.env.get("DEXT_ENV") !== "production" ? "Generating" : "Validating"
+    } commands`,
+  );
   let generatedN = 0;
   const generatedStr: string[][] = [[underline("\nCommand")]];
 
@@ -127,6 +131,9 @@ export default async function setupCommands(
           return false;
         }
 
+        commands[i].pregenerated = true;
+        if (Deno.env.get("DEXT_ENV") === "production") return;
+
         sendType(command.name, true, commands.length);
         Deno.writeTextFileSync(
           `./.dext/commands/${command.name}.json`,
@@ -135,7 +142,6 @@ export default async function setupCommands(
             stamp: Date.now(),
           }),
         );
-        commands[i].pregenerated = true;
 
         return true;
       }),
@@ -143,18 +149,20 @@ export default async function setupCommands(
 
     generatingLoader.resolve();
 
-    console.log(generatedStr.map((row) => row.join(" ")).join("\n"));
-    console.info(
-      `\n${
-        generatedResults.includes(true)
-          ? "\n○  (Static) preran as static responses"
-          : ""
-      }${
-        generatedResults.includes(false)
-          ? "\nƒ  (Dynamic)  re-evaluated every interaction"
-          : ""
-      }`,
-    );
+    if (Deno.env.get("DEXT_ENV") !== "production") {
+      console.log(generatedStr.map((row) => row.join(" ")).join("\n"));
+      console.info(
+        `\n${
+          generatedResults.includes(true)
+            ? "\n○  (Static)  preran as static responses"
+            : ""
+        }${
+          generatedResults.includes(false)
+            ? "\nƒ  (Dynamic)  re-evaluated every interaction"
+            : ""
+        }`,
+      );
+    }
 
     client.on(
       "interactionCreate",

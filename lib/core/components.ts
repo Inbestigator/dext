@@ -70,7 +70,11 @@ export default async function setupComponents(
   client: Client,
   config: DextConfig,
 ) {
-  const generatingLoader = loader("Generating components");
+  const generatingLoader = loader(
+    `${
+      Deno.env.get("DEXT_ENV") !== "production" ? "Generating" : "Validating"
+    } components`,
+  );
   let generatedN = 0;
   const generatedStr: string[][] = [[underline("\nComponent")]];
 
@@ -138,6 +142,8 @@ export default async function setupComponents(
           return false;
         }
 
+        components[i].pregenerated = true;
+        if (Deno.env.get("DEXT_ENV") === "production") return;
         sendType(component.name, component.category, true, components.length);
         Deno.writeTextFileSync(
           `./.dext/components/${component.category}/${component.name}.json`,
@@ -146,7 +152,6 @@ export default async function setupComponents(
             stamp: Date.now(),
           }),
         );
-        components[i].pregenerated = true;
 
         return true;
       }),
@@ -154,18 +159,20 @@ export default async function setupComponents(
 
     generatingLoader.resolve();
 
-    console.log(generatedStr.map((row) => row.join(" ")).join("\n"));
-    console.info(
-      `\n${
-        generatedResults.includes(true)
-          ? "\n○  (Static) preran as static responses"
-          : ""
-      }${
-        generatedResults.includes(false)
-          ? "\nƒ  (Dynamic)  re-evaluated every interaction"
-          : ""
-      }`,
-    );
+    if (Deno.env.get("DEXT_ENV") !== "production") {
+      console.log(generatedStr.map((row) => row.join(" ")).join("\n"));
+      console.info(
+        `\n${
+          generatedResults.includes(true)
+            ? "\n○  (Static)  preran as static responses"
+            : ""
+        }${
+          generatedResults.includes(false)
+            ? "\nƒ  (Dynamic)  re-evaluated every interaction"
+            : ""
+        }`,
+      );
+    }
 
     client.on(
       "interactionCreate",

@@ -19,6 +19,15 @@ program
   .command("build")
   .description("Build the bot's files in production mode.")
   .action(async () => {
+    Deno.env.set("DEXT_ENV", "build");
+    await createInstance();
+  });
+
+program
+  .command("start")
+  .description("Starts the bot in production mode.")
+  .action(async () => {
+    Deno.env.set("DEXT_ENV", "production");
     await createInstance();
   });
 

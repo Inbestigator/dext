@@ -2,7 +2,7 @@ import type { Client } from "discord.js";
 import loader from "../internal/loader.ts";
 
 export default async function authorize(client: Client, token: string) {
-  if (Deno.env.get("DEXT_ENV") !== "development") {
+  if (Deno.env.get("DEXT_ENV") === "build") {
     return;
   }
   const authLoader = loader("Authorizing");

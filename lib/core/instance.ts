@@ -43,7 +43,7 @@ export async function createInstance() {
 
   await reloadGenerators();
 
-  if (Deno.env.get("DEXT_ENV") !== "development") {
+  if (Deno.env.get("DEXT_ENV") === "build") {
     Deno.exit(0);
   } else {
     const watcher = Deno.watchFs(Deno.cwd());
@@ -86,11 +86,13 @@ export async function createInstance() {
   async function reloadGenerators() {
     if (!config) return;
 
-    try {
-      Deno.removeSync("../.dext/commands", { recursive: true });
-      Deno.removeSync("../.dext/components", { recursive: true });
-    } catch {
-      // pass
+    if (Deno.env.get("DEXT_ENV") !== "production") {
+      try {
+        Deno.removeSync("../.dext/commands", { recursive: true });
+        Deno.removeSync("../.dext/components", { recursive: true });
+      } catch {
+        // pass
+      }
     }
 
     startTimeoutWarning();
@@ -98,7 +100,9 @@ export async function createInstance() {
     resetTimeoutWarning();
     await setupComponents(client, config);
     resetTimeoutWarning();
-    await setupEvents(client);
+    if (Deno.env.get("DEXT_ENV") !== "build") {
+      await setupEvents(client);
+    }
 
     readyToReload = true;
   }
