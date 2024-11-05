@@ -1,6 +1,7 @@
 import { type Client, Events } from "discord.js";
 import { join } from "node:path";
 import loader from "../internal/loader.ts";
+import { yellow } from "@std/fmt/colors";
 
 export default async function setupEvents(client: Client) {
   const loadingLoader = loader("Loading events");
@@ -10,7 +11,7 @@ export default async function setupEvents(client: Client) {
       Deno.readDirSync("./src/events");
     } catch (err) {
       if (err instanceof Deno.errors.NotFound) {
-        console.warn(" \x1b[33m!\x1b[0m", `src/events directory not found`);
+        console.warn(` ${yellow("!")} src/events directory not found`);
       }
       return [];
     }

@@ -10,6 +10,7 @@ import type {
   ModalSubmitInteraction,
 } from "discord.js";
 import type { Command, Component } from "./types.ts";
+import { yellow } from "@std/fmt/colors";
 
 export type InteractionReply = string | InteractionReplyOptions;
 
@@ -78,8 +79,7 @@ export default function createSpyInteraction<
           throw new Error();
         } else {
           console.warn(
-            " \x1b[33m!\x1b[0m",
-            `Explicitly static ${
+            ` ${yellow("!")} Explicitly static ${
               "description" in item ? "command" : "component"
             } "${item.name}" tries to access dynamic property "${prop}"`,
           );

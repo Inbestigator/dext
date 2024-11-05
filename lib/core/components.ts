@@ -5,7 +5,7 @@ import type {
 } from "discord.js";
 import type { Component, DextConfig } from "../internal/types.ts";
 import { join } from "node:path";
-import { underline } from "@std/fmt/colors";
+import { red, underline, yellow } from "@std/fmt/colors";
 import loader from "../internal/loader.ts";
 import createSpyInteraction, {
   type CachedResponse,
@@ -223,8 +223,7 @@ export default async function setupComponents(
           } catch (error) {
             componentLoader.error();
             console.error(
-              " \x1b[31m✕\x1b[0m",
-              `Error running component "${component.name}":`,
+              ` ${red("✖")} Error running component "${component.name}":`,
               error,
             );
           }
@@ -244,7 +243,7 @@ async function fetchComponents() {
     Deno.readDirSync("./src/components");
   } catch (err) {
     if (err instanceof Deno.errors.NotFound) {
-      console.warn(" \x1b[33m!\x1b[0m", `src/components directory not found`);
+      console.warn(` ${yellow("!")} src/components directory not found`);
     }
     return [];
   }
@@ -279,8 +278,11 @@ async function fetchComponents() {
 
     if (!validComponentCategories.includes(category)) {
       console.warn(
-        " \x1b[33m!\x1b[0m",
-        `Category for "${componentName}" could not be determined, skipping`,
+        ` ${
+          yellow(
+            "!",
+          )
+        } Category for "${componentName}" could not be determined, skipping`,
       );
       continue;
     }
@@ -302,8 +304,7 @@ async function fetchComponents() {
       )
     ) {
       console.warn(
-        " \x1b[33m!\x1b[0m",
-        `${
+        ` ${yellow("!")} ${
           component.category.slice(0, 1).toUpperCase() +
           component.category.split("s")[0].slice(1)
         } component "${component.name}" already exists, skipping the duplicate`,

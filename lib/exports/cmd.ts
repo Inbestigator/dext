@@ -2,6 +2,7 @@ import loader from "../internal/loader.ts";
 import { dirname, join } from "node:path";
 import { Command } from "commander";
 import { createInstance } from "../core/instance.ts";
+import { green, italic } from "@std/fmt/colors";
 
 const program = new Command();
 
@@ -97,9 +98,8 @@ program
     mkdirLoader.resolve();
 
     console.log(
-      `Project created successfully. Please run\n$ cd ${name}${
-        !token ? "\nAdd your bot's token to .env" : ""
-      }\n$ dext dev`,
+      green("Project created successfully."),
+      italic("\n$ deno task dext dev"),
     );
   });
 

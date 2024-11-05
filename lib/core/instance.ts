@@ -8,6 +8,7 @@ import authorize from "./authorize.ts";
 import setupComponents from "./components.ts";
 import { delay } from "@std/async/delay";
 import setupEvents from "./events.ts";
+import { yellow } from "@std/fmt/colors";
 let readyToReload = false;
 
 /**
@@ -114,8 +115,11 @@ function startTimeoutWarning() {
   timeout = setTimeout(() => {
     if (!readyToReload) {
       console.log(
-        "\n \x1b[33m!\x1b[0m",
-        "This is taking a while to generate. If it hangs too long, try restarting the process. This is usually just caused by Discord API rate limits.",
+        ` ${
+          yellow(
+            "!",
+          )
+        } This is taking a while to generate. If it hangs too long, try restarting the process. This is usually just caused by Discord API rate limits.`,
       );
     }
   }, 5000);

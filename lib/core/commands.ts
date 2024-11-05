@@ -1,7 +1,7 @@
 import type { Client, CommandInteraction } from "discord.js";
 import type { Command, DextConfig } from "../internal/types.ts";
 import { join } from "node:path";
-import { underline } from "@std/fmt/colors";
+import { red, underline, yellow } from "@std/fmt/colors";
 import loader from "../internal/loader.ts";
 import type { CommandConfig } from "../exports/config.ts";
 import createSpyInteraction, {
@@ -194,8 +194,7 @@ export default async function setupCommands(
           } catch (error) {
             commandLoader.error();
             console.error(
-              " \x1b[31m✕\x1b[0m",
-              `Error running command "${command?.name}":`,
+              ` ${red("✖")}Error running command "${command?.name}":`,
               error,
             );
           }
@@ -232,8 +231,9 @@ async function fetchCommands() {
 
     if (commandData.find((c) => c.name === command.name)) {
       console.warn(
-        " \x1b[33m!\x1b[0m",
-        `Command "${command.name}" already exists, skipping the duplicate`,
+        ` ${
+          yellow("!")
+        } Command "${command.name}" already exists, skipping the duplicate`,
       );
       continue;
     }
@@ -251,7 +251,7 @@ function readdir(path: string) {
     files = Deno.readDirSync(path);
   } catch (err) {
     if (err instanceof Deno.errors.NotFound) {
-      console.warn(" \x1b[33m!\x1b[0m", `src/commands directory not found`);
+      console.warn(` ${yellow("!")} src/commands directory not found`);
     }
     return [];
   }
