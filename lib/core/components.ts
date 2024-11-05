@@ -11,7 +11,7 @@ import createSpyInteraction, {
   type CachedResponse,
   type InteractionReply,
 } from "../internal/spyInteraction.ts";
-import type { ComponentData } from "../exports.ts";
+import type { ComponentData } from "../exports/types.ts";
 
 async function validateAndCache<
   T extends MessageComponentInteraction | ModalSubmitInteraction,

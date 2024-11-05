@@ -1,8 +1,7 @@
-import createInstance from "./core/instance.ts";
 import type {
   Command as CommandType,
   Component as ComponentType,
-} from "./internal/types.ts";
+} from "../internal/types.ts";
 
 /**
  * Configuration for a specific command.
@@ -17,6 +16,4 @@ export interface CommandData extends Omit<CommandType, "name" | "default"> {}
 export interface ComponentData
   extends Omit<ComponentType, "name" | "default" | "category"> {}
 
-export type { DextConfig } from "./internal/types.ts";
-
-export default createInstance;
+export type { DextConfig } from "../internal/types.ts";

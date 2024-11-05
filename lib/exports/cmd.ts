@@ -1,7 +1,7 @@
-import loader from "./internal/loader.ts";
+import loader from "../internal/loader.ts";
 import { dirname, join } from "node:path";
 import { Command } from "commander";
-import createInstance from "./core/instance.ts";
+import { createInstance } from "../core/instance.ts";
 
 const program = new Command();
 

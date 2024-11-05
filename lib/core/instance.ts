@@ -13,7 +13,7 @@ let readyToReload = false;
 /**
  * Creates a new Dext instance of your bot.
  */
-export default async function createInstance() {
+export async function createInstance() {
   const initLoader = loader("Initializing");
 
   const config = await fetchConfig();
