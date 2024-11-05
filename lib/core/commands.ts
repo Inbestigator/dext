@@ -4,64 +4,8 @@ import { join } from "node:path";
 import { red, underline, yellow } from "@std/fmt/colors";
 import loader from "../internal/loader.ts";
 import type { CommandConfig } from "../exports/config.ts";
-import createSpyInteraction, {
-  type CachedResponse,
-} from "../internal/spyInteraction.ts";
-
-async function validateAndCache(
-  command: Command,
-  interaction: CommandInteraction,
-  client: Client,
-  expiry: number,
-) {
-  const cacheFilePath = `./.dext/commands/${command.name}.json`;
-
-  try {
-    const { response, stamp } = JSON.parse(
-      new TextDecoder().decode(Deno.readFileSync(cacheFilePath)),
-    ) as { response: CachedResponse; stamp: number };
-
-    if (Date.now() - stamp < (command.revalidate ?? expiry) && response.reply) {
-      switch (typeof response.reply) {
-        case "object":
-          if ("modal" in response.reply) {
-            await interaction.showModal(response.reply.data);
-          } else if ("deferred" in response.reply && response.reply.deferred) {
-            await interaction.deferReply({
-              ephemeral: response.reply.ephemeral,
-            });
-          } else {
-            await interaction.reply(response.reply);
-          }
-          break;
-        default:
-          await interaction.reply(response.reply);
-      }
-
-      for (const followUp of response.followUps) {
-        await interaction.followUp(followUp);
-      }
-      return;
-    }
-  } catch {
-    // pass
-  }
-
-  const interactionMock = createSpyInteraction<CommandInteraction>(
-    command,
-    interaction,
-  );
-
-  await Promise.resolve(command.default(interactionMock, client));
-
-  Deno.writeTextFileSync(
-    cacheFilePath,
-    JSON.stringify({
-      response: interactionMock.response(),
-      stamp: Date.now(),
-    }),
-  );
-}
+import createSpyInteraction from "../internal/spyInteraction.ts";
+import { validateAndCache } from "../internal/validate.ts";
 
 export default async function setupCommands(
   client: Client,
@@ -93,7 +37,9 @@ export default async function setupCommands(
   try {
     const commands = await fetchCommands();
 
-    await client.application?.commands.set(commands);
+    if (Deno.env.get("DEXT_ENV") !== "build") {
+      await client.application?.commands.set(commands);
+    }
 
     try {
       await Deno.mkdir("./.dext/commands", { recursive: true });
@@ -185,7 +131,7 @@ export default async function setupCommands(
                 command,
                 interaction,
                 client,
-                config.cacheExpiry ?? 24 * 60 * 60 * 1000,
+                config.cacheExpiry ?? 24 * 60 * 60,
               );
             } else {
               await command.default(interaction, client);

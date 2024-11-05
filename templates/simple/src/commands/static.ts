@@ -4,7 +4,7 @@ import type { CommandConfig } from "@inbestigator/dext";
 export const config: CommandConfig = {
   description: "Shows how a pregenerated command doesn't run every time",
   options: [],
-  revalidate: 5000,
+  revalidate: 5,
 };
 
 let num = 0;

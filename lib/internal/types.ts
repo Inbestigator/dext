@@ -27,7 +27,7 @@ export interface DextConfig {
   clientSecret?: string;
 
   /**
-   * How long to cache static commands before revalidating.
+   * How long to cache static items before revalidating. (Seconds)
    */
   cacheExpiry?: number;
 }
@@ -59,9 +59,9 @@ export interface Command {
   pregenerated?: boolean;
 
   /**
-   * How long to cache this static command before revalidating.
+   * How long to cache this static command before revalidating. (Seconds)
    *
-   * **Overrides `cacheExpiry` config**
+   * **Overrides `cacheExpiry` in your Dext config**
    */
   revalidate?: number;
 }
@@ -91,9 +91,9 @@ export interface Component {
   pregenerated?: boolean;
 
   /**
-   * How long to cache this static component before revalidating.
+   * How long to cache this static component before revalidating. (Seconds)
    *
-   * **Overrides `cacheExpiry` config**
+   * **Overrides `cacheExpiry` in your Dext config**
    */
   revalidate?: number;
 }

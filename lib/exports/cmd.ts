@@ -47,7 +47,7 @@ program
       Deno.exit(1);
     }
     if (!token) {
-      token = prompt("Bot token (optional in this process):");
+      token = prompt("Bot token (optional):");
     }
     if (simple === undefined) {
       simple = confirm("Do you want to use a simple template?");

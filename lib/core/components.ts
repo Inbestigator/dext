@@ -7,64 +7,9 @@ import type { Component, DextConfig } from "../internal/types.ts";
 import { join } from "node:path";
 import { red, underline, yellow } from "@std/fmt/colors";
 import loader from "../internal/loader.ts";
-import createSpyInteraction, {
-  type CachedResponse,
-  type InteractionReply,
-} from "../internal/spyInteraction.ts";
+import createSpyInteraction from "../internal/spyInteraction.ts";
 import type { ComponentConfig } from "../exports/config.ts";
-
-async function validateAndCache<
-  T extends MessageComponentInteraction | ModalSubmitInteraction,
->(component: Component, interaction: T, client: Client, expiry: number) {
-  const cacheFilePath =
-    `./.dext/components/${component.category}/${component.name}.json`;
-
-  try {
-    const { response, stamp } = JSON.parse(
-      new TextDecoder().decode(Deno.readFileSync(cacheFilePath)),
-    ) as { response: CachedResponse; stamp: number };
-
-    if (
-      Date.now() - stamp < (component.revalidate ?? expiry) &&
-      response.reply
-    ) {
-      switch (typeof response.reply) {
-        case "object":
-          if ("modal" in response.reply && "showModal" in interaction) {
-            await interaction.showModal(response.reply.data);
-          } else if ("deferred" in response.reply && response.reply.deferred) {
-            await interaction.deferReply({
-              ephemeral: response.reply.ephemeral,
-            });
-          } else {
-            await interaction.reply(response.reply as InteractionReply);
-          }
-          break;
-        default:
-          await interaction.reply(response.reply);
-      }
-
-      for (const followUp of response.followUps) {
-        await interaction.followUp(followUp);
-      }
-      return;
-    }
-  } catch {
-    // pass
-  }
-
-  const interactionMock = createSpyInteraction<T>(component, interaction);
-
-  await Promise.resolve(component.default(interactionMock, client));
-
-  Deno.writeTextFileSync(
-    cacheFilePath,
-    JSON.stringify({
-      response: interactionMock.response(),
-      stamp: Date.now(),
-    }),
-  );
-}
+import { validateAndCache } from "../internal/validate.ts";
 
 export default async function setupComponents(
   client: Client,
@@ -214,7 +159,7 @@ export default async function setupComponents(
                 component,
                 interaction,
                 client,
-                config.cacheExpiry ?? 24 * 60 * 60 * 1000,
+                config.cacheExpiry ?? 24 * 60 * 60,
               );
             } else {
               await component.default(interaction, client);

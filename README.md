@@ -16,7 +16,7 @@ import type { CommandConfig } from "@inbestigator/dext";
 export const config: CommandConfig = {
   description: "I will only change every 6 seconds",
   options: [],
-  revalidate: 6000,
+  revalidate: 6,
 };
 
 let num = 0;

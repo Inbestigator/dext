@@ -2,7 +2,7 @@ import type { MessageComponentInteraction } from "discord.js";
 import type { ComponentConfig } from "@inbestigator/dext";
 
 export const config: ComponentConfig = {
-  revalidate: 9999 * 60 * 60 * 1000,
+  revalidate: 9999 * 60 * 60,
 };
 
 export default function staticButton(interaction: MessageComponentInteraction) {
