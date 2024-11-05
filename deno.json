@@ -1,6 +1,6 @@
 {
   "name": "@inbestigator/dext",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "imports": {
     "@std/async": "jsr:@std/async@^1.0.8",
     "@std/dotenv": "jsr:@std/dotenv@^0.225.2",

@@ -115,7 +115,7 @@ function startTimeoutWarning() {
   timeout = setTimeout(() => {
     if (!readyToReload) {
       console.log(
-        ` ${
+        `\r ${
           yellow(
             "!",
           )

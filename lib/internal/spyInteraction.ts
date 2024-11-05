@@ -1,10 +1,6 @@
 import type {
-  // @ts-ignore Type not found
-  APIModalInteractionResponseCallbackData,
   CommandInteraction,
   InteractionReplyOptions,
-  // @ts-ignore Type not found
-  JSONEncodable,
   MessageComponentInteraction,
   ModalComponentData,
   ModalSubmitInteraction,
@@ -19,15 +15,12 @@ export interface CachedResponse {
     | InteractionReply
     | null
     | {
-      deferred: true;
+      deferred: boolean;
       ephemeral?: boolean;
     }
     | {
-      modal: true;
-      data:
-        | JSONEncodable<APIModalInteractionResponseCallbackData>
-        | ModalComponentData
-        | APIModalInteractionResponseCallbackData;
+      modal: boolean;
+      data: ModalComponentData;
     };
   followUps: InteractionReply[];
 }
@@ -61,9 +54,17 @@ export default function createSpyInteraction<
       }
       if (allValidResponses.includes(prop as ValidResponse)) {
         return (data: unknown) => {
+          if (
+            data &&
+            typeof data === "object" &&
+            "toJSON" in data &&
+            typeof data.toJSON === "function"
+          ) {
+            data = data.toJSON();
+          }
           actions.push({
             type: prop as ValidResponse,
-            data,
+            data: data,
           });
           if (!interaction) {
             return () => {};
@@ -114,19 +115,22 @@ export default function createSpyInteraction<
             if (
               finalActions.reply &&
               typeof finalActions.reply === "object" &&
-              "deferred" in finalActions.reply
+              !("modal" in finalActions.reply)
             ) {
+              if ("deferred" in finalActions.reply) {
+                finalActions.reply.deferred = false;
+              }
               switch (typeof action.data) {
                 case "string":
                   finalActions.reply = {
+                    ...finalActions.reply,
                     content: action.data,
-                    ephemeral: finalActions.reply.ephemeral,
                   };
                   break;
                 case "object":
                   finalActions.reply = {
+                    ...finalActions.reply,
                     ...action.data,
-                    ephemeral: finalActions.reply.ephemeral,
                   };
                   break;
               }
@@ -140,10 +144,7 @@ export default function createSpyInteraction<
           case "showModal":
             finalActions.reply = {
               modal: true,
-              data: action.data as
-                | JSONEncodable<APIModalInteractionResponseCallbackData>
-                | ModalComponentData
-                | APIModalInteractionResponseCallbackData,
+              data: action.data as ModalComponentData,
             };
             break;
         }
