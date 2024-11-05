@@ -6,7 +6,7 @@ Compile Discord.js interactions at build time.
 > To automagically create a Dext bootstrapped bot, run the command
 >
 > ```bash
-> deno run -A jsr:@inbestigator/dext create-new
+> deno run -A jsr:@inbestigator/dext/cmd create-new
 > ```
 
 ```ts
