@@ -25,10 +25,10 @@ import {
 
 const categories: {
     title: string;
-    icon: ReactNode;
+    icon: React.ElementType;
     pages: { title: string; url: string }[];
     url?: string;
-} = [
+}[] = [
     {
         title: "Commands",
         icon: Terminal,
