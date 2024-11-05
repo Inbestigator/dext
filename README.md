@@ -18,9 +18,9 @@ dext create-new
 
 ```ts
 import type { CommandInteraction } from "discord.js";
-import type { CommandData } from "@inbestigator/dext";
+import type { CommandConfig } from "@inbestigator/dext/config";
 
-export const config: CommandData = {
+export const config: CommandConfig = {
   description: "I will only change every 6 seconds",
   options: [],
   revalidate: 6000,

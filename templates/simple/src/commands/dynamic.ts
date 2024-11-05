@@ -1,7 +1,7 @@
 import type { CommandInteraction } from "discord.js";
-import type { CommandData } from "@inbestigator/dext";
+import type { CommandConfig } from "@inbestigator/dext/config";
 
-export const config: CommandData = {
+export const config: CommandConfig = {
   description: "Returns a greeting",
   options: [],
 };

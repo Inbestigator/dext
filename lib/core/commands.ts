@@ -3,7 +3,7 @@ import type { Command, DextConfig } from "../internal/types.ts";
 import { join } from "node:path";
 import { underline } from "@std/fmt/colors";
 import loader from "../internal/loader.ts";
-import type { CommandData } from "../exports/types.ts";
+import type { CommandConfig } from "../exports/config.ts";
 import createSpyInteraction, {
   type CachedResponse,
 } from "../internal/spyInteraction.ts";
@@ -206,7 +206,7 @@ async function fetchCommands() {
 
   for (const commandName of commandNames) {
     const commandModule = (await import(commandName)) as {
-      config?: CommandData;
+      config?: CommandConfig;
       default: (interaction: CommandInteraction, client: Client) => unknown;
     };
     const command: Command = {

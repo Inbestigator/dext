@@ -1,7 +1,7 @@
-import type { CommandInteraction } from "npm:discord.js";
-import type { CommandData } from "@inbestigator/dext";
+import type { CommandInteraction } from "discord.js";
+import type { CommandConfig } from "@inbestigator/dext/config";
 
-export const config: CommandData = {
+export const config: CommandConfig = {
   description: "Shows how a pregenerated command doesn't run every time",
   options: [],
   revalidate: 5000,

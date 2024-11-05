@@ -11,7 +11,7 @@ import createSpyInteraction, {
   type CachedResponse,
   type InteractionReply,
 } from "../internal/spyInteraction.ts";
-import type { ComponentData } from "../exports/types.ts";
+import type { ComponentConfig } from "../exports/config.ts";
 
 async function validateAndCache<
   T extends MessageComponentInteraction | ModalSubmitInteraction,
@@ -259,7 +259,7 @@ async function fetchComponents() {
 
   for (const componentName of componentNames) {
     const componentModule = (await import(componentName)) as {
-      config?: ComponentData;
+      config?: ComponentConfig;
       default: (
         interaction: MessageComponentInteraction | ModalSubmitInteraction,
         client: Client,
