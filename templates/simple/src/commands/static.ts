@@ -1,5 +1,5 @@
 import type { CommandInteraction } from "discord.js";
-import type { CommandConfig } from "@inbestigator/dext/config";
+import type { CommandConfig } from "@inbestigator/dext";
 
 export const config: CommandConfig = {
   description: "Shows how a pregenerated command doesn't run every time",

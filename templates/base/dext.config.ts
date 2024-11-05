@@ -1,4 +1,4 @@
-import type { DextConfig } from "@inbestigator/dext/config";
+import type { DextConfig } from "@inbestigator/dext";
 
 const config: DextConfig = {
   client: { intents: [] },

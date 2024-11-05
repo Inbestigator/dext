@@ -6,7 +6,7 @@ This is a simple [Discord.js](https://discord.js.org) project bootstrapped with
 First, run the development bot:
 
 ```bash
-dext dev
+deno task dext dev
 ```
 
 You can edit your bot by modifying `src/commands/static.ts`. The bot

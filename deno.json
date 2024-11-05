@@ -1,6 +1,6 @@
 {
   "name": "@inbestigator/dext",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "imports": {
     "@std/async": "jsr:@std/async@^1.0.8",
     "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
@@ -26,7 +26,7 @@
     ]
   },
   "exports": {
-    ".": "./lib/exports/cmd.ts",
-    "./config": "./lib/exports/config.ts"
+    ".": "./lib/exports/config.ts",
+    "./cmd": "./lib/exports/cmd.ts"
   }
 }

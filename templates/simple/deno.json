@@ -1,4 +1,7 @@
 {
+  "tasks": {
+    "dext": "deno run -A jsr:@inbestigator/dext"
+  },
   "imports": {
     "discord.js": "npm:discord.js",
     "@inbestigator/dext": "jsr:@inbestigator/dext"

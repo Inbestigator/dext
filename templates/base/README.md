@@ -6,7 +6,7 @@ This is an empty [Discord.js](https://discord.js.org) project bootstrapped with
 First, run the development bot:
 
 ```bash
-dext dev
+deno task dext dev
 ```
 
 You can check out

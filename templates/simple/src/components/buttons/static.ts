@@ -1,5 +1,5 @@
 import type { MessageComponentInteraction } from "discord.js";
-import type { ComponentConfig } from "@inbestigator/dext/config";
+import type { ComponentConfig } from "@inbestigator/dext";
 
 export const config: ComponentConfig = {
   revalidate: 9999 * 60 * 60 * 1000,
