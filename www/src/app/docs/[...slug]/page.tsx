@@ -103,7 +103,7 @@ export default async function DocsPage({
           </Breadcrumb>
         </div>
       </header>
-      <div className="p-4 pt-0">
+      <div className="p-4 pt-0 max-w-[100vw]">
         <DocsMD content={doc.content} />
       </div>
     </>
