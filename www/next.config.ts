@@ -4,8 +4,7 @@ const nextConfig: NextConfig = {
   redirects: async () => [
     {
       source: "/docs",
-      destination: "/docs/commands",
-      permanent: false,
+      destination: "/docs/home",
     },
   ],
 };
