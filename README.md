@@ -5,7 +5,7 @@ performance. It automatically handles slash command creation, event responses,
 and is easy to use and integrate.
 
 > [!NOTE]\
-> To automagically create a Dext bootstrapped bot, run the command
+> To automagically create a bot bootstrapped with Dext, run the command
 >
 > ```bash
 > deno run -A jsr:@inbestigator/dext/cmd create-new
