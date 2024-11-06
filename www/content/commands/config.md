@@ -44,8 +44,8 @@ revalidating (actually running) the command again.
 
 ### Pregenerated - _boolean_
 
-Pregenerate will override Dext's decision on whether a command is static or not,
-this is good for if you want to make an asynchronous command be statically
+Pregenerated will override Dext's decision on whether a command is static or
+not, this is good for if you want to make an asynchronous command be statically
 generated.
 
 `true` - force static

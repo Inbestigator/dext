@@ -11,10 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import fs from "fs";
 
-const allFiles = readDir("content");
-
 export function generateStaticParams() {
-  return allFiles.map((s) => ({ slug: s.slug }));
+  return readDir("content").map((s) => ({ slug: s.slug }));
 }
 
 function readDir(path: string) {
@@ -44,7 +42,11 @@ export default async function DocsPage({
   params: Promise<{ slug: string[] }>;
 }) {
   const slug = (await params).slug;
-  const doc = allFiles.find((s) => s.slug.join("/") === slug.join("/"));
+  let doc: { slug: string[]; content: string } | undefined;
+
+  try {
+    doc = readDir("content").find((s) => s.slug.join("/") === slug.join("/"));
+  } catch {}
 
   if (!doc) {
     return (
