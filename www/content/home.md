@@ -51,3 +51,9 @@ Finally, start your bot in development mode
 ```bash
 deno task dext dev
 ```
+
+## Links
+
+- [Website](https://dext.vercel.app)
+- [JSR](https://jsr.io/@inbestigator/dext)
+- [GitHub](https://github.com/inbestigator/dext)
