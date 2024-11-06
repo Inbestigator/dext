@@ -1,118 +1,99 @@
+"use client";
+
+import * as React from "react";
 import {
-    ChevronDown,
-    MessageCircleWarning,
-    Puzzle,
-    Terminal,
+  Command,
+  Github,
+  MessageCircleWarning,
+  Puzzle,
+  Terminal,
 } from "lucide-react";
+
+import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 import Link from "next/link";
 
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "@/components/ui/sidebar";
-
-const categories: {
-    title: string;
-    icon: React.ElementType;
-    pages: { title: string; url: string }[];
-    url?: string;
-}[] = [
+const data = {
+  navMain: [
     {
-        title: "Commands",
-        icon: Terminal,
-        pages: [
-            {
-                title: "Prerendering",
-                url: "/docs/commands/prerendering",
-            },
-        ],
+      title: "Commands",
+      url: "/docs/commands",
+      icon: Terminal,
+      items: [
+        {
+          title: "Config",
+          url: "/docs/commands/config",
+        },
+        {
+          title: "Static Commands",
+          url: "/docs/commands/static-commands",
+        },
+      ],
     },
     {
-        title: "Components",
-        icon: Puzzle,
-        pages: [
-            {
-                title: "Overview",
-                url: "/docs/",
-            },
-        ],
+      title: "Components",
+      url: "/docs/components",
+      icon: Puzzle,
+      isActive: true,
+      items: [
+        {
+          title: "Config",
+          url: "/docs/components/config",
+        },
+        {
+          title: "Static Components",
+          url: "/docs/components/static-components",
+        },
+      ],
     },
     {
-        title: "Events",
-        icon: MessageCircleWarning,
-        pages: [],
-        url: "/docs/events",
+      title: "Events",
+      url: "/docs/events",
+      icon: MessageCircleWarning,
     },
-];
+  ],
+  navSecondary: [
+    {
+      title: "GitHub",
+      url: "https://github.com/inbestigator/dext",
+      icon: Github,
+    },
+  ],
+};
 
-export function DocsSidebar() {
-    return (
-        <Sidebar>
-            <SidebarContent>
-                {categories.map((category) => {
-                    if (category.pages.length === 0) {
-                        return (
-                            <SidebarGroup key={category.title}>
-                                <SidebarMenuButton asChild>
-                                    <Link href={category.url ?? "/docs"}>
-                                        <category.icon />
-                                        {category.title}
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarGroup>
-                        );
-                    }
-                    return (
-                        <Collapsible
-                            className="group/collapsible"
-                            key={category.title}
-                        >
-                            <SidebarGroup>
-                                <SidebarGroupLabel asChild>
-                                    <SidebarMenuButton asChild>
-                                        <CollapsibleTrigger>
-                                            <category.icon />
-                                            {category.title}
-                                            <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                                        </CollapsibleTrigger>
-                                    </SidebarMenuButton>
-                                </SidebarGroupLabel>
-                                <CollapsibleContent>
-                                    <SidebarGroupContent>
-                                        <SidebarMenu>
-                                            {category.pages.map((
-                                                page,
-                                            ) => (
-                                                <SidebarMenuItem
-                                                    key={page.title}
-                                                >
-                                                    <SidebarMenuButton asChild>
-                                                        <Link href={page.url}>
-                                                            {page.title}
-                                                        </Link>
-                                                    </SidebarMenuButton>
-                                                </SidebarMenuItem>
-                                            ))}
-                                        </SidebarMenu>
-                                    </SidebarGroupContent>
-                                </CollapsibleContent>
-                            </SidebarGroup>
-                        </Collapsible>
-                    );
-                })}
-            </SidebarContent>
-        </Sidebar>
-    );
+export function DocsSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  return (
+    <Sidebar variant="inset" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Command className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left leading-tight">
+                  <span className="truncate font-semibold">Dext</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <NavMain items={data.navMain} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
+      </SidebarContent>
+    </Sidebar>
+  );
 }

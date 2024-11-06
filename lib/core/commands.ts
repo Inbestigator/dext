@@ -56,10 +56,9 @@ export default async function setupCommands(
         );
 
         try {
-          const result = await Promise.resolve(
-            command.default(interactionMock, client),
-          );
+          const result = command.default(interactionMock, client);
           if (result instanceof Promise) {
+            await result;
             command.pregenerated = false;
           }
         } catch {

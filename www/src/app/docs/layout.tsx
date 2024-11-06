@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DocsSidebar } from "@/components/docs-sidebar";
 
 export const metadata: Metadata = {
@@ -7,15 +7,15 @@ export const metadata: Metadata = {
   description: "",
 };
 
-export default function DocsLayout(
-  { children }: { children: React.ReactNode },
-) {
+export default function DocsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <SidebarProvider>
       <DocsSidebar />
-      <article>
-        {children}
-      </article>
+      <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   );
 }

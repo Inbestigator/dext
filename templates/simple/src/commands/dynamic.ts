@@ -3,7 +3,6 @@ import type { CommandConfig } from "@inbestigator/dext";
 
 export const config: CommandConfig = {
   description: "Returns a greeting",
-  options: [],
 };
 
 export default function dynamicCmd(interaction: CommandInteraction) {

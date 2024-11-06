@@ -61,10 +61,9 @@ export default async function setupComponents(
         >(component);
 
         try {
-          const result = await Promise.resolve(
-            component.default(interactionMock, client),
-          );
+          const result = component.default(interactionMock, client);
           if (result instanceof Promise) {
+            await result;
             component.pregenerated = false;
           }
         } catch {
