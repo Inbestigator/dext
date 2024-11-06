@@ -53,4 +53,4 @@ generated.
 `false` - force dynamic
 
 To learn more about static vs dynamic commands, see
-[this page](/docs/commands/static-commands).
+[this page](/docs/static-vs-dynamic).

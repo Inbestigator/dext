@@ -7,6 +7,7 @@ import {
   MessageCircleWarning,
   Puzzle,
   Terminal,
+  Zap,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -32,10 +33,6 @@ const data = {
           title: "Config",
           url: "/docs/commands/config",
         },
-        {
-          title: "Static Commands",
-          url: "/docs/commands/static-commands",
-        },
       ],
     },
     {
@@ -48,16 +45,17 @@ const data = {
           title: "Config",
           url: "/docs/components/config",
         },
-        {
-          title: "Static Components",
-          url: "/docs/components/static-components",
-        },
       ],
     },
     {
       title: "Events",
       url: "/docs/events",
       icon: MessageCircleWarning,
+    },
+    {
+      title: "Static vs Dynamic",
+      url: "/docs/static-vs-dynamic",
+      icon: Zap,
     },
   ],
   navSecondary: [
