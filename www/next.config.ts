@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  redirects: async () => [
+  rewrites: async () => [
     {
       source: "/docs",
       destination: "/docs/home",
