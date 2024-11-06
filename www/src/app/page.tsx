@@ -4,7 +4,7 @@ import { ExternalLink } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="h-dvh flex flex-col items-center justify-center text-center gap-10 max-w-5xl mx-auto">
+    <div className="py-10 min-h-dvh flex flex-col items-center justify-center text-center gap-10 max-w-5xl mx-auto">
       <h1 className="z-10 text-[max(36px,min(5vw,72px))] font-black leading-tight sm:leading-tight">
         The best{"  "}
         <Link
@@ -18,12 +18,10 @@ export default function Home() {
         framework for Discord.js.
       </h1>
       <p className="hidden sm:block">
-        Dext is a powerful Discord.js framework that autogenerates responses for
-        {" "}
-        <em>static</em>{" "}
-        commands and components, optimizing bot performance. It automatically
-        handles slash command creation, event responses, and is easy to use and
-        integrate.
+        Dext is a powerful Discord.js framework that autogenerates responses for{" "}
+        <em>static</em> commands and components, optimizing bot performance. It
+        automatically handles slash command creation, event responses, and is
+        easy to use and integrate.
       </p>
       <p className="sm:hidden">
         Dext is a powerful Discord.js framework that optimizes bot performance.

@@ -1,6 +1,8 @@
 # Dext
 
-Compile Discord.js interactions at build time.
+Dext autogenerates responses for static commands and components, optimizing bot
+performance. It automatically handles slash command creation, event responses,
+and is easy to use and integrate.
 
 > [!NOTE]\
 > To automagically create a Dext bootstrapped bot, run the command
